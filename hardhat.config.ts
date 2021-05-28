@@ -71,8 +71,11 @@ module.exports = {
         hardhat: {
           forking: {
             url: process.env.FORK_ETHEREUM_RPC_URL,
-            blockNumber: 12452914
-          }
+            blockNumber: 12522190
+          },
+          accounts: {
+            mnemonic: process.env.DEPLOYER_ACCOUNT_MNEMONIC,
+          },
         },
       }
       :
