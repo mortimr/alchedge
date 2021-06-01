@@ -1,17 +1,16 @@
 import * as chai from 'chai'
+import { ethers, artifacts } from 'hardhat';
+import { Signer, BigNumber, Contract } from 'ethers';
+import { EACAggregatorProxyAbi } from '../testAbis/EACAggregatorProxy';
+import { AlchemistAbi } from '../testAbis/Alchemist';
+import { ERC20Abi } from '../testAbis/ERC20';
+import { AlTokenAbi } from '../testAbis/alToken';
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 
-import { ethers, artifacts } from 'hardhat';
-
-import { Signer, BigNumber, Contract, providers } from 'ethers';
-import { EACAggregatorProxyAbi } from '../testAbis/EACAggregatorProxy';
-import { AlchemistAbi } from '../testAbis/Alchemist';
-import { ERC20Abi } from '../testAbis/ERC20';
-import { AlTokenAbi } from '../testAbis/alToken';
-import { Log } from '@ethereumjs/vm/dist/evm/types';
 
 interface Context {
   signers: Signer[]
@@ -218,7 +217,7 @@ describe('HegicAlUSD', function () {
 
   describe('testing eth options scenarios', function () {
 
-    it('purchase 50k Dai of eth 3400 1 week otm put @ 3328.39', async function () {
+    it('purchase 50k Dai of eth 2300 1 week otm put @ 2487.32', async function () {
 
       // recover current data from oracle
       const currentData = await ctx.dependencies.EACETHAggregatorProxy.latestRoundData();
@@ -247,13 +246,13 @@ describe('HegicAlUSD', function () {
       await ctx.dependencies.Alchemist.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).mint(alchemixDepositAmount.div(2));
 
       // estimate eth amount retrieve from swaps
-      const wethGoingToBePaid = await ctx.contracts.TBDETH.getEthAmountFromAlUSD(alchemixDepositAmount.div(2));
+      const wethGoingToBePaid = await ctx.contracts.TBDETH.getEthFeeFromAlUSD(alchemixDepositAmount.div(2));
 
       // approve and trigger option purchase
       await ctx.dependencies.alUSD.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).approve(ctx.contracts.TBDETH.address, alchemixDepositAmount.div(2))
-      const createTx = await ctx.contracts.TBDETH.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).purchaseEthOptionWithAlUSD(
+      const createTx = await ctx.contracts.TBDETH.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).purchaseOptionWithAlUSD(
         alchemixDepositAmount.div(2),
-        BigNumber.from('340000000000'),
+        BigNumber.from('230000000000'),
         604800,
         await ctx.impersonatedAccounts.RandomOnChainDaiBillionaire.getAddress(),
         1,
@@ -269,82 +268,83 @@ describe('HegicAlUSD', function () {
       const optionDetails = await ctx.dependencies.HegicETHOptions.options(optionCreation.args.optionID);
 
       // change eth price in mocked aggregator
-      await ctx.mocks.AggregatorV3Mock.setLatestRoundData(currentData.roundId, BigNumber.from('230000000000'), currentData.startedAt, currentData.updatedAt, currentData.answeredInRound);
+      await ctx.mocks.AggregatorV3Mock.setLatestRoundData(currentData.roundId, BigNumber.from('170000000000'), currentData.startedAt, currentData.updatedAt, currentData.answeredInRound);
 
       const balance = await ethers.provider.getBalance(userAddress)
 
       await ctx.dependencies.HegicETHOptions.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).exercise(optionCreation.args.optionID);
       const balanceAfter = await ethers.provider.getBalance(userAddress);
 
-      expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('52271420847105931301');
-      expect(optionDetails.premium.add(optionDetails.amount.div(100)).sub(wethGoingToBePaid).toString()).to.equal('-2');
-
-    }).timeout(60000);
-
-    it('purchase 50k Dai of eth 3000 1 week itm put @ 3328.39', async function () {
-
-      // recover current data from oracle
-      const currentData = await ctx.dependencies.EACETHAggregatorProxy.latestRoundData();
-      // set current data in mock contract
-      await ctx.mocks.AggregatorV3Mock.setLatestRoundData(currentData.roundId, currentData.answer, currentData.startedAt, currentData.updatedAt, currentData.answeredInRound);
-
-      const userAddress = await ctx.impersonatedAccounts.RandomOnChainDaiBillionaire.getAddress();
-
-      // give eth to impersonated account
-      await ctx.signers[0].sendTransaction({
-        to: userAddress,
-        value: ethers.BigNumber.from('1000000000000000000').toHexString()
-      });
-
-      // will make a 100000 deposit on alchemix, to purchase a 50k premium put option
-      const alchemixDepositAmount = ethers.BigNumber.from('100000').mul(ETH_DECIMALS);
-
-      // change oracle to use mock
-      await changeETHPriceAggregator(ctx.mocks.AggregatorV3Mock.address);
-      // change alchemist ceiling
-      await increaseAlchemistCeiling(alchemixDepositAmount);
-
-      // deposit and retrieve 50k alUSD
-      await ctx.dependencies.Dai.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).approve(ctx.dependencies.Alchemist.address, alchemixDepositAmount)
-      await ctx.dependencies.Alchemist.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).deposit(alchemixDepositAmount);
-      await ctx.dependencies.Alchemist.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).mint(alchemixDepositAmount.div(2));
-
-      // estimate eth amount retrieve from swaps
-      const wethGoingToBePaid = await ctx.contracts.TBDETH.getEthAmountFromAlUSD(alchemixDepositAmount.div(2));
-
-      // approve and trigger option purchase
-      await ctx.dependencies.alUSD.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).approve(ctx.contracts.TBDETH.address, alchemixDepositAmount.div(2))
-      const createTx = await ctx.contracts.TBDETH.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).purchaseEthOptionWithAlUSD(
-        alchemixDepositAmount.div(2),
-        BigNumber.from('300000000000'),
-        604800,
-        await ctx.impersonatedAccounts.RandomOnChainDaiBillionaire.getAddress(),
-        1,
-        wethGoingToBePaid.mul(995).div(1000) // 0.5% slippage allowed
-      );
-
-      const optionCreation = parsePurchaseLog((await ethers.provider.getLogs({
-        ...ctx.contracts.TBDETH.filters.PurchaseOption(userAddress),
-        fromBlock: createTx.blockNumber,
-        toBlock: createTx.blockNumber
-      }))[0])
-
-      const optionDetails = await ctx.dependencies.HegicETHOptions.options(optionCreation.args.optionID);
-
-      // change eth price in mocked aggregator
-      await ctx.mocks.AggregatorV3Mock.setLatestRoundData(currentData.roundId, BigNumber.from('270000000000'), currentData.startedAt, currentData.updatedAt, currentData.answeredInRound);
-
-      const balance = await ethers.provider.getBalance(userAddress)
-
-      await ctx.dependencies.HegicETHOptions.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).exercise(optionCreation.args.optionID);
-      const balanceAfter = await ethers.provider.getBalance(userAddress);
-
-      expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('6799431192543520208');
+      expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('70652561549095706671');
       expect(optionDetails.premium.add(optionDetails.amount.div(100)).sub(wethGoingToBePaid).toString()).to.equal('-1');
 
     }).timeout(60000);
 
-    it('purchase 50k Dai of eth 3600 1 week otm call @ 3328.39', async function () {
+    it('purchase 50k Dai of eth 2500 1 week itm put @ 2487.32', async function () {
+
+      // recover current data from oracle
+      const currentData = await ctx.dependencies.EACETHAggregatorProxy.latestRoundData();
+
+      // set current data in mock contract
+      await ctx.mocks.AggregatorV3Mock.setLatestRoundData(currentData.roundId, currentData.answer, currentData.startedAt, currentData.updatedAt, currentData.answeredInRound);
+
+      const userAddress = await ctx.impersonatedAccounts.RandomOnChainDaiBillionaire.getAddress();
+
+      // give eth to impersonated account
+      await ctx.signers[0].sendTransaction({
+        to: userAddress,
+        value: ethers.BigNumber.from('1000000000000000000').toHexString()
+      });
+
+      // will make a 100000 deposit on alchemix, to purchase a 50k premium put option
+      const alchemixDepositAmount = ethers.BigNumber.from('100000').mul(ETH_DECIMALS);
+
+      // change oracle to use mock
+      await changeETHPriceAggregator(ctx.mocks.AggregatorV3Mock.address);
+      // change alchemist ceiling
+      await increaseAlchemistCeiling(alchemixDepositAmount);
+
+      // deposit and retrieve 50k alUSD
+      await ctx.dependencies.Dai.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).approve(ctx.dependencies.Alchemist.address, alchemixDepositAmount)
+      await ctx.dependencies.Alchemist.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).deposit(alchemixDepositAmount);
+      await ctx.dependencies.Alchemist.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).mint(alchemixDepositAmount.div(2));
+
+      // estimate eth amount retrieve from swaps
+      const wethGoingToBePaid = await ctx.contracts.TBDETH.getEthFeeFromAlUSD(alchemixDepositAmount.div(2));
+
+      // approve and trigger option purchase
+      await ctx.dependencies.alUSD.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).approve(ctx.contracts.TBDETH.address, alchemixDepositAmount.div(2))
+      const createTx = await ctx.contracts.TBDETH.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).purchaseOptionWithAlUSD(
+        alchemixDepositAmount.div(2),
+        BigNumber.from('250000000000'),
+        604800,
+        await ctx.impersonatedAccounts.RandomOnChainDaiBillionaire.getAddress(),
+        1,
+        wethGoingToBePaid.mul(995).div(1000) // 0.5% slippage allowed
+      );
+
+      const optionCreation = parsePurchaseLog((await ethers.provider.getLogs({
+        ...ctx.contracts.TBDETH.filters.PurchaseOption(userAddress),
+        fromBlock: createTx.blockNumber,
+        toBlock: createTx.blockNumber
+      }))[0])
+
+      const optionDetails = await ctx.dependencies.HegicETHOptions.options(optionCreation.args.optionID);
+
+      // change eth price in mocked aggregator
+      await ctx.mocks.AggregatorV3Mock.setLatestRoundData(currentData.roundId, BigNumber.from('180000000000'), currentData.startedAt, currentData.updatedAt, currentData.answeredInRound);
+
+      const balance = await ethers.provider.getBalance(userAddress)
+
+      await ctx.dependencies.HegicETHOptions.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).exercise(optionCreation.args.optionID);
+      const balanceAfter = await ethers.provider.getBalance(userAddress);
+
+      expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('67539944468486811996');
+      expect(optionDetails.premium.add(optionDetails.amount.div(100)).sub(wethGoingToBePaid).toString()).to.equal('-2');
+
+    }).timeout(60000);
+
+    it('purchase 50k Dai of eth 3600 1 week otm call @ 2487.32', async function () {
 
       // recover current data from oracle
       const currentData = await ctx.dependencies.EACETHAggregatorProxy.latestRoundData();
@@ -373,11 +373,11 @@ describe('HegicAlUSD', function () {
       await ctx.dependencies.Alchemist.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).mint(alchemixDepositAmount.div(2));
 
       // estimate eth amount retrieve from swaps
-      const wethGoingToBePaid = await ctx.contracts.TBDETH.getEthAmountFromAlUSD(alchemixDepositAmount.div(2));
+      const wethGoingToBePaid = await ctx.contracts.TBDETH.getEthFeeFromAlUSD(alchemixDepositAmount.div(2));
 
       // approve and trigger option purchase
       await ctx.dependencies.alUSD.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).approve(ctx.contracts.TBDETH.address, alchemixDepositAmount.div(2))
-      const createTx = await ctx.contracts.TBDETH.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).purchaseEthOptionWithAlUSD(
+      const createTx = await ctx.contracts.TBDETH.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).purchaseOptionWithAlUSD(
         alchemixDepositAmount.div(2),
         BigNumber.from('360000000000'),
         604800,
@@ -402,12 +402,12 @@ describe('HegicAlUSD', function () {
       await ctx.dependencies.HegicETHOptions.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).exercise(optionCreation.args.optionID);
       const balanceAfter = await ethers.provider.getBalance(userAddress);
 
-      expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('12427034989235996217');
+      expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('27009998599674874051');
       expect(optionDetails.premium.add(optionDetails.amount.div(100)).sub(wethGoingToBePaid).toString()).to.equal('-1');
 
     }).timeout(60000);
 
-    it('purchase 50k Dai of eth 3300 1 week itm call @ 3328.39', async function () {
+    it('purchase 50k Dai of eth 3300 1 week itm call @ 2487.32', async function () {
 
       // recover current data from oracle
       const currentData = await ctx.dependencies.EACETHAggregatorProxy.latestRoundData();
@@ -436,11 +436,11 @@ describe('HegicAlUSD', function () {
       await ctx.dependencies.Alchemist.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).mint(alchemixDepositAmount.div(2));
 
       // estimate eth amount retrieve from swaps
-      const wethGoingToBePaid = await ctx.contracts.TBDETH.getEthAmountFromAlUSD(alchemixDepositAmount.div(2));
+      const wethGoingToBePaid = await ctx.contracts.TBDETH.getEthFeeFromAlUSD(alchemixDepositAmount.div(2));
 
       // approve and trigger option purchase
       await ctx.dependencies.alUSD.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).approve(ctx.contracts.TBDETH.address, alchemixDepositAmount.div(2))
-      const createTx = await ctx.contracts.TBDETH.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).purchaseEthOptionWithAlUSD(
+      const createTx = await ctx.contracts.TBDETH.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).purchaseOptionWithAlUSD(
         alchemixDepositAmount.div(2),
         BigNumber.from('330000000000'),
         604800,
@@ -465,8 +465,8 @@ describe('HegicAlUSD', function () {
       await ctx.dependencies.HegicETHOptions.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).exercise(optionCreation.args.optionID);
       const balanceAfter = await ethers.provider.getBalance(userAddress);
 
-      expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('19634396900275047065');
-      expect(optionDetails.premium.add(optionDetails.amount.div(100)).sub(wethGoingToBePaid).toString()).to.equal('-2');
+      expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('45584914340063155846');
+      expect(optionDetails.premium.add(optionDetails.amount.div(100)).sub(wethGoingToBePaid).toString()).to.equal('-1');
 
     }).timeout(60000);
 
@@ -499,11 +499,11 @@ describe('HegicAlUSD', function () {
       await ctx.dependencies.Alchemist.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).mint(alchemixDepositAmount.div(2));
 
       // estimate eth amount retrieve from swaps
-      const wethGoingToBePaid = await ctx.contracts.TBDETH.getEthAmountFromAlUSD(alchemixDepositAmount.div(2));
+      const wethGoingToBePaid = await ctx.contracts.TBDETH.getEthFeeFromAlUSD(alchemixDepositAmount.div(2));
 
       // approve and trigger option purchase
       await ctx.dependencies.alUSD.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).approve(ctx.contracts.TBDETH.address, alchemixDepositAmount.div(4))
-      await expect(ctx.contracts.TBDETH.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).purchaseEthOptionWithAlUSD(
+      await expect(ctx.contracts.TBDETH.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).purchaseOptionWithAlUSD(
         alchemixDepositAmount.div(2),
         BigNumber.from('360000000000'),
         604800,
@@ -518,7 +518,7 @@ describe('HegicAlUSD', function () {
 
   describe('testing btc options scenarios', function () {
 
-    it('purchase 50k Dai of btc 39000 1 week otm put @ 43661.40', async function () {
+    it('purchase 50k Dai of btc 39000 1 week otm put @ 35869.7', async function () {
 
       // recover current data from oracle
       const currentData = await ctx.dependencies.EACBTCAggregatorProxy.latestRoundData();
@@ -547,12 +547,12 @@ describe('HegicAlUSD', function () {
       await ctx.dependencies.Alchemist.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).mint(alchemixDepositAmount.div(2));
 
       // estimate eth amount retrieve from swaps
-      const wethGoingToBePaid = await ctx.contracts.TBDBTC.getEthAmountFromAlUSD(alchemixDepositAmount.div(2));
-      const wbtcGoingToBePaid = await ctx.contracts.TBDBTC.getBtcAmountFromAlUSD(alchemixDepositAmount.div(2));
+      const wethGoingToBePaid = await ctx.contracts.TBDBTC.getEthFeeFromAlUSD(alchemixDepositAmount.div(2));
+      const wbtcGoingToBePaid = await ctx.contracts.TBDBTC.getUnderlyingFeeFromAlUSD(alchemixDepositAmount.div(2));
 
       // approve and trigger option purchase
       await ctx.dependencies.alUSD.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).approve(ctx.contracts.TBDBTC.address, alchemixDepositAmount.div(2))
-      const createTx = await ctx.contracts.TBDBTC.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).purchaseBtcOptionWithAlUSD(
+      const createTx = await ctx.contracts.TBDBTC.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).purchaseOptionWithAlUSD(
         alchemixDepositAmount.div(2),
         BigNumber.from('3900000000000'),
         604800,
@@ -577,12 +577,12 @@ describe('HegicAlUSD', function () {
       await ctx.dependencies.HegicBTCOptions.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).exercise(optionCreation.args.optionID);
       const balanceAfter = await ctx.dependencies.Wbtc.balanceOf(userAddress);
 
-      expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('470822293');
+      expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('127587842');
       expect(optionDetails.premium.add(optionDetails.amount.div(100)).sub(wbtcGoingToBePaid).toString()).to.equal('-1');
 
     }).timeout(60000);
 
-    it('purchase 50k Dai of btc 44000 1 week otm put @ 43661.40', async function () {
+    it('purchase 50k Dai of btc 44000 1 week otm put @ 35869.7', async function () {
 
       // recover current data from oracle
       const currentData = await ctx.dependencies.EACBTCAggregatorProxy.latestRoundData();
@@ -611,12 +611,12 @@ describe('HegicAlUSD', function () {
       await ctx.dependencies.Alchemist.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).mint(alchemixDepositAmount.div(2));
 
       // estimate eth amount retrieve from swaps
-      const wethGoingToBePaid = await ctx.contracts.TBDBTC.getEthAmountFromAlUSD(alchemixDepositAmount.div(2));
-      const wbtcGoingToBePaid = await ctx.contracts.TBDBTC.getBtcAmountFromAlUSD(alchemixDepositAmount.div(2));
+      const wethGoingToBePaid = await ctx.contracts.TBDBTC.getEthFeeFromAlUSD(alchemixDepositAmount.div(2));
+      const wbtcGoingToBePaid = await ctx.contracts.TBDBTC.getUnderlyingFeeFromAlUSD(alchemixDepositAmount.div(2));
 
       // approve and trigger option purchase
       await ctx.dependencies.alUSD.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).approve(ctx.contracts.TBDBTC.address, alchemixDepositAmount.div(2))
-      const createTx = await ctx.contracts.TBDBTC.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).purchaseBtcOptionWithAlUSD(
+      const createTx = await ctx.contracts.TBDBTC.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).purchaseOptionWithAlUSD(
         alchemixDepositAmount.div(2),
         BigNumber.from('4400000000000'),
         604800,
@@ -641,12 +641,12 @@ describe('HegicAlUSD', function () {
       await ctx.dependencies.HegicBTCOptions.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).exercise(optionCreation.args.optionID);
       const balanceAfter = await ctx.dependencies.Wbtc.balanceOf(userAddress);
 
-      expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('620482966');
+      expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('74797009');
       expect(optionDetails.premium.add(optionDetails.amount.div(100)).sub(wbtcGoingToBePaid).toString()).to.equal('-2');
 
     }).timeout(60000);
 
-    it('purchase 50k Dai of btc 48000 1 week otm call @ 43661.40', async function () {
+    it('purchase 50k Dai of btc 48000 1 week otm call @ 35869.7', async function () {
 
       // recover current data from oracle
       const currentData = await ctx.dependencies.EACBTCAggregatorProxy.latestRoundData();
@@ -675,12 +675,12 @@ describe('HegicAlUSD', function () {
       await ctx.dependencies.Alchemist.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).mint(alchemixDepositAmount.div(2));
 
       // estimate eth amount retrieve from swaps
-      const wethGoingToBePaid = await ctx.contracts.TBDBTC.getEthAmountFromAlUSD(alchemixDepositAmount.div(2));
-      const wbtcGoingToBePaid = await ctx.contracts.TBDBTC.getBtcAmountFromAlUSD(alchemixDepositAmount.div(2));
+      const wethGoingToBePaid = await ctx.contracts.TBDBTC.getEthFeeFromAlUSD(alchemixDepositAmount.div(2));
+      const wbtcGoingToBePaid = await ctx.contracts.TBDBTC.getUnderlyingFeeFromAlUSD(alchemixDepositAmount.div(2));
 
       // approve and trigger option purchase
       await ctx.dependencies.alUSD.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).approve(ctx.contracts.TBDBTC.address, alchemixDepositAmount.div(2))
-      const createTx = await ctx.contracts.TBDBTC.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).purchaseBtcOptionWithAlUSD(
+      const createTx = await ctx.contracts.TBDBTC.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).purchaseOptionWithAlUSD(
         alchemixDepositAmount.div(2),
         BigNumber.from('4800000000000'),
         604800,
@@ -705,12 +705,12 @@ describe('HegicAlUSD', function () {
       await ctx.dependencies.HegicBTCOptions.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).exercise(optionCreation.args.optionID);
       const balanceAfter = await ctx.dependencies.Wbtc.balanceOf(userAddress);
 
-      expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('130244477');
+      expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('210267000');
       expect(optionDetails.premium.add(optionDetails.amount.div(100)).sub(wbtcGoingToBePaid).toString()).to.equal('-1');
 
     }).timeout(60000);
 
-    it('purchase 50k Dai of btc 42000 1 week itm call @ 43661.40', async function () {
+    it('purchase 50k Dai of btc 42000 1 week itm call @ 35869.7', async function () {
 
       // recover current data from oracle
       const currentData = await ctx.dependencies.EACBTCAggregatorProxy.latestRoundData();
@@ -739,12 +739,12 @@ describe('HegicAlUSD', function () {
       await ctx.dependencies.Alchemist.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).mint(alchemixDepositAmount.div(2));
 
       // estimate eth amount retrieve from swaps
-      const wethGoingToBePaid = await ctx.contracts.TBDBTC.getEthAmountFromAlUSD(alchemixDepositAmount.div(2));
-      const wbtcGoingToBePaid = await ctx.contracts.TBDBTC.getBtcAmountFromAlUSD(alchemixDepositAmount.div(2));
+      const wethGoingToBePaid = await ctx.contracts.TBDBTC.getEthFeeFromAlUSD(alchemixDepositAmount.div(2));
+      const wbtcGoingToBePaid = await ctx.contracts.TBDBTC.getUnderlyingFeeFromAlUSD(alchemixDepositAmount.div(2));
 
       // approve and trigger option purchase
       await ctx.dependencies.alUSD.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).approve(ctx.contracts.TBDBTC.address, alchemixDepositAmount.div(2))
-      const createTx = await ctx.contracts.TBDBTC.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).purchaseBtcOptionWithAlUSD(
+      const createTx = await ctx.contracts.TBDBTC.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).purchaseOptionWithAlUSD(
         alchemixDepositAmount.div(2),
         BigNumber.from('4200000000000'),
         604800,
@@ -769,8 +769,8 @@ describe('HegicAlUSD', function () {
       await ctx.dependencies.HegicBTCOptions.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).exercise(optionCreation.args.optionID);
       const balanceAfter = await ctx.dependencies.Wbtc.balanceOf(userAddress);
 
-      expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('143937955');
-      expect(optionDetails.premium.add(optionDetails.amount.div(100)).sub(wbtcGoingToBePaid).toString()).to.equal('-2');
+      expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('442901429');
+      expect(optionDetails.premium.add(optionDetails.amount.div(100)).sub(wbtcGoingToBePaid).toString()).to.equal('-1');
 
     }).timeout(60000);
 
@@ -803,11 +803,11 @@ describe('HegicAlUSD', function () {
       await ctx.dependencies.Alchemist.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).mint(alchemixDepositAmount.div(2));
 
       // estimate eth amount retrieve from swaps
-      const wethGoingToBePaid = await ctx.contracts.TBDETH.getEthAmountFromAlUSD(alchemixDepositAmount.div(2));
+      const wethGoingToBePaid = await ctx.contracts.TBDETH.getEthFeeFromAlUSD(alchemixDepositAmount.div(2));
 
       // approve and trigger option purchase
       await ctx.dependencies.alUSD.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).approve(ctx.contracts.TBDETH.address, alchemixDepositAmount.div(4))
-      await expect(ctx.contracts.TBDBTC.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).purchaseBtcOptionWithAlUSD(
+      await expect(ctx.contracts.TBDBTC.connect(ctx.impersonatedAccounts.RandomOnChainDaiBillionaire).purchaseOptionWithAlUSD(
         alchemixDepositAmount.div(2),
         BigNumber.from('4000000000000'),
         604800,

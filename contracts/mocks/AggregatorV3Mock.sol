@@ -2,7 +2,6 @@
 pragma solidity ^0.7.6;
 
 contract AggregatorV3Mock {
-    // mock latest round data
 
     uint80 internal _roundId;
     int256 internal _answer;

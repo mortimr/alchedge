@@ -69,6 +69,7 @@ module.exports = {
     ...(process.env.FORK === 'true' ?
       {
         hardhat: {
+          chainId: 1337,
           forking: {
             url: process.env.FORK_ETHEREUM_RPC_URL,
             blockNumber: 12522190

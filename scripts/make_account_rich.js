@@ -27,7 +27,7 @@ const main = async () => {
 
     const Dai = new Contract(DaiContract, ERC20Abi, provider);
 
-    await Dai.connect(DaiRichSigner).transfer(process.argv[2], parseEther('1000000'));
+    await Dai.connect(DaiRichSigner).transfer(process.argv[2], parseEther('100000000'));
 
     console.log(await provider.getNetwork());
 

@@ -18,7 +18,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   await deploy('TBDETH', {
     from: deployer,
-    args: [hegicEthOptionsMainnetAddress, alUSDAddress, WethAddress, DaiAddress, alUSDMetaPoolAddress, uniswapV2Router02Address],
+    args: [hegicEthOptionsMainnetAddress, alUSDAddress, DaiAddress, WethAddress, alUSDMetaPoolAddress, uniswapV2Router02Address],
     log: true,
     gasLimit: 2000000,
     gasPrice: process.env.GAS_PRICE
@@ -26,7 +26,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   await deploy('TBDBTC', {
     from: deployer,
-    args: [hegicEthOptionsMainnetAddress, alUSDAddress, WethAddress, WbtcAddress, DaiAddress, alUSDMetaPoolAddress, uniswapV2Router02Address],
+    args: [hegicBtcOptionsMainnetAddress, alUSDAddress, DaiAddress, WethAddress, WbtcAddress, alUSDMetaPoolAddress, uniswapV2Router02Address],
     log: true,
     gasLimit: 2000000,
     gasPrice: process.env.GAS_PRICE

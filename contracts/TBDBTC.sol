@@ -1,29 +1,44 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.7.6;
+pragma abicoder v2;
 
 import './interfaces/IHegicBTCOptions.sol';
 import './interfaces/ICurve.sol';
 import './interfaces/IUniswapV2Router02.sol';
 import './interfaces/IChainlinkAggregatorV3.sol';
 import './interfaces/IERC20.sol';
-import '@openzeppelin/contracts/math/SafeMath.sol';
 import './interfaces/IWETH.sol';
+import './interfaces/ITBD.sol';
 
-contract TBDBTC {
+import '@openzeppelin/contracts/math/SafeMath.sol';
+
+contract TBDBTC is ITBD {
     using SafeMath for uint256;
 
+    // Curve MetaPool used to convert alUSD to Dai
     ICurve alUSDMetaPool;
+
+    // Hegic BTC Options contract
     IHegicBTCOptions hegicBTCOptions;
+
+    // Uniswap router to convert Dai to Eth
     IUniswapV2Router02 uniswapV2Router02;
+
+    // alUSD, Dai, Wbtc and Weth ERC20 contracts
     IERC20 alUSD;
     IERC20 Dai;
     IERC20 Wbtc;
     IWETH Weth;
+
+    // Store of created options
+    mapping(address => ITBD.Option[]) public optionsByOwner;
+
+    // Uniswap exchange paths Dai => Eth and Eth => Wbtc
     address[] public uniswapExchangePath;
     address[] public uniswapBtcExchangePath;
-    uint256 constant PRICE_DECIMALS = 1e8;
 
-    event PurchaseOption(address indexed owner, uint256 optionID, uint256 purchasePrice, address purchaseToken, uint256 fees);
+    // Decimals for price values from aggregators
+    uint256 constant PRICE_DECIMALS = 1e8;
 
     constructor(
         address _hegicBTCOptions,
@@ -51,14 +66,16 @@ contract TBDBTC {
         uniswapBtcExchangePath[1] = _Wbtc;
     }
 
-    function purchaseBtcOptionWithAlUSD(
+    /// ITBD overriden functions
+
+    function purchaseOptionWithAlUSD(
         uint256 amount,
         uint256 strike,
         uint256 period,
         address owner,
-        IHegicBTCOptions.OptionType optionType,
+        IHegicOptionTypes.OptionType optionType,
         uint256 minETH
-    ) public returns (uint256 optionID) {
+    ) public override returns (uint256 optionID) {
         require(alUSD.transferFrom(msg.sender, address(this), amount), 'TBD/cannot-transfer-alusd');
 
         uint256 curveDyInDai = alUSDMetaPool.get_dy_underlying(0, 1, amount);
@@ -70,14 +87,14 @@ contract TBDBTC {
 
         Dai.approve(address(uniswapV2Router02), curveDyInDai);
 
-        uint256[] memory uniswapAmounts = uniswapV2Router02.swapExactTokensForETH(
-            curveDyInDai,
-            minETH,
-            uniswapExchangePath,
-            address(this),
-            block.timestamp
-        );
-
+        uint256[] memory uniswapAmounts =
+            uniswapV2Router02.swapExactTokensForETH(
+                curveDyInDai,
+                minETH,
+                uniswapExchangePath,
+                address(this),
+                block.timestamp
+            );
 
         uint256 optionAmount = getAmount(period, uniswapAmounts[1], strike, optionType);
 
@@ -86,30 +103,46 @@ contract TBDBTC {
 
         emit PurchaseOption(owner, optionID, amount, address(alUSD), uniswapAmounts[1]);
 
+        optionsByOwner[msg.sender].push(ITBD.Option({id: optionID, priceInAlUSD: amount}));
+
         return optionID;
     }
 
-    receive() external payable {}
+    function getOptionsByOwner(address owner) external view override returns (ITBD.Option[] memory) {
+        return optionsByOwner[owner];
+    }
 
-    function getEthAmountFromAlUSD(uint256 amount) external view returns (uint256) {
+    function getUnderlyingFeeFromAlUSD(uint256 amount) external view override returns (uint256) {
+        uint256 curveDyInDai = alUSDMetaPool.get_dy_underlying(0, 1, amount);
+        uint256[] memory uniswapWethOutput = uniswapV2Router02.getAmountsOut(curveDyInDai, uniswapExchangePath);
+        return uniswapV2Router02.getAmountsOut(uniswapWethOutput[1], uniswapBtcExchangePath)[1];
+    }
+
+    function getEthFeeFromAlUSD(uint256 amount) external view override returns (uint256) {
         uint256 curveDyInDai = alUSDMetaPool.get_dy_underlying(0, 1, amount);
         return uniswapV2Router02.getAmountsOut(curveDyInDai, uniswapExchangePath)[1];
     }
 
-    function getBtcAmountFromAlUSD(uint256 amount) external view returns (uint256) {
+    function getOptionAmountFromAlUSD(
+        uint256 period,
+        uint256 amount,
+        uint256 strike,
+        IHegicOptionTypes.OptionType optionType
+    ) external view override returns (uint256) {
         uint256 curveDyInDai = alUSDMetaPool.get_dy_underlying(0, 1, amount);
         uint256[] memory uniswapWethOutput = uniswapV2Router02.getAmountsOut(curveDyInDai, uniswapExchangePath);
-        return uniswapV2Router02.getAmountsOut(uniswapWethOutput[1], uniswapBtcExchangePath)[1];
+
+        return getAmount(period, uniswapWethOutput[1], strike, optionType);
     }
 
     function getAmount(
         uint256 period,
         uint256 fees,
         uint256 strike,
-        IHegicBTCOptions.OptionType optionType
-    ) public view returns (uint256) {
+        IHegicOptionTypes.OptionType optionType
+    ) public view override returns (uint256) {
         require(
-            optionType == IHegicBTCOptions.OptionType.Put || optionType == IHegicBTCOptions.OptionType.Call,
+            optionType == IHegicOptionTypes.OptionType.Put || optionType == IHegicOptionTypes.OptionType.Call,
             'invalid option type'
         );
         (, int256 latestPrice, , , ) = IChainlinkAggregatorV3(hegicBTCOptions.priceProvider()).latestRoundData();
@@ -117,7 +150,7 @@ contract TBDBTC {
         uint256 iv = hegicBTCOptions.impliedVolRate();
         uint256 convertedFees = uniswapV2Router02.getAmountsOut(fees, uniswapBtcExchangePath)[1];
 
-        if (optionType == IHegicBTCOptions.OptionType.Put) {
+        if (optionType == IHegicOptionTypes.OptionType.Put) {
             if (strike > currentPrice) {
                 // ITM Put Fee
                 uint256 nume = convertedFees.mul(currentPrice).mul(PRICE_DECIMALS);
@@ -152,13 +185,14 @@ contract TBDBTC {
         }
     }
 
-    /**
-     * @return result Square root of the number
-     */
+    /// Misc
+
     function sqrt(uint256 x) private pure returns (uint256 result) {
         result = x;
         uint256 k = x.div(2).add(1);
         while (k < result) (result, k) = (k, x.div(k).add(k).div(2));
     }
+
+    receive() external payable {}
 
 }
