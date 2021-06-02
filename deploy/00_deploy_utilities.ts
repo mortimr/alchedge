@@ -16,7 +16,7 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  await deploy('TBDETH', {
+  const TBDETHReceipt = await deploy('TBDETH', {
     from: deployer,
     args: [hegicEthOptionsMainnetAddress, alUSDAddress, DaiAddress, WethAddress, alUSDMetaPoolAddress, uniswapV2Router02Address],
     log: true,
@@ -24,13 +24,47 @@ const deploy: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     gasPrice: process.env.GAS_PRICE
   });
 
-  await deploy('TBDBTC', {
+  if (process.env.ETHERSCAN_API_KEY) {
+    try {
+      await hre.run("verify:verify", {
+        address: TBDETHReceipt.address,
+        constructorArguments: [
+          hegicEthOptionsMainnetAddress, alUSDAddress, DaiAddress, WethAddress, alUSDMetaPoolAddress, uniswapV2Router02Address
+        ],
+      })
+    } catch (e) {
+      if (e.message !== 'Contract source code already verified') {
+        throw e;
+      } else {
+        console.log('Contract already verified')
+      }
+    }
+  }
+
+  const TBDBTCReceipt = await deploy('TBDBTC', {
     from: deployer,
     args: [hegicBtcOptionsMainnetAddress, alUSDAddress, DaiAddress, WethAddress, WbtcAddress, alUSDMetaPoolAddress, uniswapV2Router02Address],
     log: true,
     gasLimit: 2000000,
     gasPrice: process.env.GAS_PRICE
   });
+
+  if (process.env.ETHERSCAN_API_KEY) {
+    try {
+      await hre.run("verify:verify", {
+        address: TBDBTCReceipt.address,
+        constructorArguments: [
+          hegicBtcOptionsMainnetAddress, alUSDAddress, DaiAddress, WethAddress, WbtcAddress, alUSDMetaPoolAddress, uniswapV2Router02Address
+        ],
+      })
+    } catch (e) {
+      if (e.message !== 'Contract source code already verified') {
+        throw e;
+      } else {
+        console.log('Contract already verified')
+      }
+    }
+  }
 
 };
 

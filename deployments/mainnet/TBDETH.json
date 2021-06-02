@@ -1,0 +1,546 @@
+{
+  "address": "0x6a1c6eb6edb430a2b7337bb256b3101d1289a925",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_hegicETHOptions",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_alUSD",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_Dai",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_Weth",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_alUSDMetaPool",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_uniswapV2Router02",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "optionID",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "purchasePrice",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "purchaseToken",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "fees",
+          "type": "uint256"
+        }
+      ],
+      "name": "PurchaseOption",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "period",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "fees",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "strike",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum IHegicOptionTypes.OptionType",
+          "name": "optionType",
+          "type": "uint8"
+        }
+      ],
+      "name": "getAmount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "getEthFeeFromAlUSD",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "period",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "strike",
+          "type": "uint256"
+        },
+        {
+          "internalType": "enum IHegicOptionTypes.OptionType",
+          "name": "optionType",
+          "type": "uint8"
+        }
+      ],
+      "name": "getOptionAmountFromAlUSD",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "getOptionsByOwner",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "priceInAlUSD",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct ITBD.Option[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "getUnderlyingFeeFromAlUSD",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "optionsByOwner",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "priceInAlUSD",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "strike",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "period",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "internalType": "enum IHegicOptionTypes.OptionType",
+          "name": "optionType",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint256",
+          "name": "minETH",
+          "type": "uint256"
+        }
+      ],
+      "name": "purchaseOptionWithAlUSD",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "optionID",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "uniswapExchangePath",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
+    }
+  ],
+  "transactionHash": "0x85c65bb95796325831e5db4fbbb34462167107dccec9b844c2d11a911946d015",
+  "receipt": {
+    "to": null,
+    "from": "0x7084ebefc24d44a38ccbe2739268afefed27e2f9",
+    "contractAddress": "0x6a1c6eb6edb430a2b7337bb256b3101d1289a925",
+    "transactionIndex": "0x4d",
+    "gasUsed": "0x16b2ce",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x2c9d15c710dd3a0402f6588649aae335dde77fb0c4bf8068bbfd983a44c9c207",
+    "transactionHash": "0x85c65bb95796325831e5db4fbbb34462167107dccec9b844c2d11a911946d015",
+    "logs": [],
+    "blockNumber": "0xbf9345",
+    "cumulativeGasUsed": "0x73264c",
+    "status": "0x1"
+  },
+  "args": [
+    "0xEfC0eEAdC1132A12c9487d800112693bf49EcfA2",
+    "0xBC6DA0FE9aD5f3b0d58160288917AA56653660E9",
+    "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+    "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "0x43b4fdfd4ff969587185cdb6f0bd875c5fc83f8c",
+    "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+  ],
+  "solcInputHash": "4a3416f8c66069612043c0835b3255a4",
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_hegicETHOptions\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_alUSD\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_Dai\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_Weth\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_alUSDMetaPool\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_uniswapV2Router02\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"optionID\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"purchasePrice\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"purchaseToken\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"fees\",\"type\":\"uint256\"}],\"name\":\"PurchaseOption\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"period\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"fees\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"strike\",\"type\":\"uint256\"},{\"internalType\":\"enum IHegicOptionTypes.OptionType\",\"name\":\"optionType\",\"type\":\"uint8\"}],\"name\":\"getAmount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"getEthFeeFromAlUSD\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"period\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"strike\",\"type\":\"uint256\"},{\"internalType\":\"enum IHegicOptionTypes.OptionType\",\"name\":\"optionType\",\"type\":\"uint8\"}],\"name\":\"getOptionAmountFromAlUSD\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"getOptionsByOwner\",\"outputs\":[{\"components\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"priceInAlUSD\",\"type\":\"uint256\"}],\"internalType\":\"struct ITBD.Option[]\",\"name\":\"\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"getUnderlyingFeeFromAlUSD\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"optionsByOwner\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"id\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"priceInAlUSD\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"strike\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"period\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"enum IHegicOptionTypes.OptionType\",\"name\":\"optionType\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"minETH\",\"type\":\"uint256\"}],\"name\":\"purchaseOptionWithAlUSD\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"optionID\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"uniswapExchangePath\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"getAmount(uint256,uint256,uint256,uint8)\":{\"params\":{\"fees\":\"Amount of Eth paid\",\"optionType\":\"1 for PUT, 2 for CALL\",\"period\":\"Option period in seconds (min 1 day, max 28 days) \",\"strike\":\"Strike price (with 8 decimals)\"}},\"getEthFeeFromAlUSD(uint256)\":{\"params\":{\"amount\":\"alUSD amount used\"}},\"getOptionAmountFromAlUSD(uint256,uint256,uint256,uint8)\":{\"params\":{\"amount\":\"Amount of AlUSD paid\",\"optionType\":\"1 for PUT, 2 for CALL\",\"period\":\"Option period in seconds (min 1 day, max 28 days) \",\"strike\":\"Strike price (with 8 decimals)\"}},\"getOptionsByOwner(address)\":{\"params\":{\"owner\":\"Owner of the options to retrieve\"}},\"getUnderlyingFeeFromAlUSD(uint256)\":{\"params\":{\"amount\":\"alUSD amount used\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"getAmount(uint256,uint256,uint256,uint8)\":{\"notice\":\"Retrieve the option size from the raw eth fee paid to Hegic\"},\"getEthFeeFromAlUSD(uint256)\":{\"notice\":\"Retrieve option creation cost in eth\"},\"getOptionAmountFromAlUSD(uint256,uint256,uint256,uint8)\":{\"notice\":\"Retrieve the option size depending on all parameters + alUSD paid\"},\"getOptionsByOwner(address)\":{\"notice\":\"Retrieve created options\"},\"getUnderlyingFeeFromAlUSD(uint256)\":{\"notice\":\"Retrieve option creation cost in the underlying token\"},\"purchaseOptionWithAlUSD(uint256,uint256,uint256,address,uint8,uint256)\":{\"notice\":\"ITBD overriden functions\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/TBDETH.sol\":\"TBDETH\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/math/SafeMath.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity >=0.6.0 <0.8.0;\\n\\n/**\\n * @dev Wrappers over Solidity's arithmetic operations with added overflow\\n * checks.\\n *\\n * Arithmetic operations in Solidity wrap on overflow. This can easily result\\n * in bugs, because programmers usually assume that an overflow raises an\\n * error, which is the standard behavior in high level programming languages.\\n * `SafeMath` restores this intuition by reverting the transaction when an\\n * operation overflows.\\n *\\n * Using this library instead of the unchecked operations eliminates an entire\\n * class of bugs, so it's recommended to use it always.\\n */\\nlibrary SafeMath {\\n    /**\\n     * @dev Returns the addition of two unsigned integers, with an overflow flag.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function tryAdd(uint256 a, uint256 b) internal pure returns (bool, uint256) {\\n        uint256 c = a + b;\\n        if (c < a) return (false, 0);\\n        return (true, c);\\n    }\\n\\n    /**\\n     * @dev Returns the substraction of two unsigned integers, with an overflow flag.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function trySub(uint256 a, uint256 b) internal pure returns (bool, uint256) {\\n        if (b > a) return (false, 0);\\n        return (true, a - b);\\n    }\\n\\n    /**\\n     * @dev Returns the multiplication of two unsigned integers, with an overflow flag.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function tryMul(uint256 a, uint256 b) internal pure returns (bool, uint256) {\\n        // Gas optimization: this is cheaper than requiring 'a' not being zero, but the\\n        // benefit is lost if 'b' is also tested.\\n        // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522\\n        if (a == 0) return (true, 0);\\n        uint256 c = a * b;\\n        if (c / a != b) return (false, 0);\\n        return (true, c);\\n    }\\n\\n    /**\\n     * @dev Returns the division of two unsigned integers, with a division by zero flag.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function tryDiv(uint256 a, uint256 b) internal pure returns (bool, uint256) {\\n        if (b == 0) return (false, 0);\\n        return (true, a / b);\\n    }\\n\\n    /**\\n     * @dev Returns the remainder of dividing two unsigned integers, with a division by zero flag.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function tryMod(uint256 a, uint256 b) internal pure returns (bool, uint256) {\\n        if (b == 0) return (false, 0);\\n        return (true, a % b);\\n    }\\n\\n    /**\\n     * @dev Returns the addition of two unsigned integers, reverting on\\n     * overflow.\\n     *\\n     * Counterpart to Solidity's `+` operator.\\n     *\\n     * Requirements:\\n     *\\n     * - Addition cannot overflow.\\n     */\\n    function add(uint256 a, uint256 b) internal pure returns (uint256) {\\n        uint256 c = a + b;\\n        require(c >= a, \\\"SafeMath: addition overflow\\\");\\n        return c;\\n    }\\n\\n    /**\\n     * @dev Returns the subtraction of two unsigned integers, reverting on\\n     * overflow (when the result is negative).\\n     *\\n     * Counterpart to Solidity's `-` operator.\\n     *\\n     * Requirements:\\n     *\\n     * - Subtraction cannot overflow.\\n     */\\n    function sub(uint256 a, uint256 b) internal pure returns (uint256) {\\n        require(b <= a, \\\"SafeMath: subtraction overflow\\\");\\n        return a - b;\\n    }\\n\\n    /**\\n     * @dev Returns the multiplication of two unsigned integers, reverting on\\n     * overflow.\\n     *\\n     * Counterpart to Solidity's `*` operator.\\n     *\\n     * Requirements:\\n     *\\n     * - Multiplication cannot overflow.\\n     */\\n    function mul(uint256 a, uint256 b) internal pure returns (uint256) {\\n        if (a == 0) return 0;\\n        uint256 c = a * b;\\n        require(c / a == b, \\\"SafeMath: multiplication overflow\\\");\\n        return c;\\n    }\\n\\n    /**\\n     * @dev Returns the integer division of two unsigned integers, reverting on\\n     * division by zero. The result is rounded towards zero.\\n     *\\n     * Counterpart to Solidity's `/` operator. Note: this function uses a\\n     * `revert` opcode (which leaves remaining gas untouched) while Solidity\\n     * uses an invalid opcode to revert (consuming all remaining gas).\\n     *\\n     * Requirements:\\n     *\\n     * - The divisor cannot be zero.\\n     */\\n    function div(uint256 a, uint256 b) internal pure returns (uint256) {\\n        require(b > 0, \\\"SafeMath: division by zero\\\");\\n        return a / b;\\n    }\\n\\n    /**\\n     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),\\n     * reverting when dividing by zero.\\n     *\\n     * Counterpart to Solidity's `%` operator. This function uses a `revert`\\n     * opcode (which leaves remaining gas untouched) while Solidity uses an\\n     * invalid opcode to revert (consuming all remaining gas).\\n     *\\n     * Requirements:\\n     *\\n     * - The divisor cannot be zero.\\n     */\\n    function mod(uint256 a, uint256 b) internal pure returns (uint256) {\\n        require(b > 0, \\\"SafeMath: modulo by zero\\\");\\n        return a % b;\\n    }\\n\\n    /**\\n     * @dev Returns the subtraction of two unsigned integers, reverting with custom message on\\n     * overflow (when the result is negative).\\n     *\\n     * CAUTION: This function is deprecated because it requires allocating memory for the error\\n     * message unnecessarily. For custom revert reasons use {trySub}.\\n     *\\n     * Counterpart to Solidity's `-` operator.\\n     *\\n     * Requirements:\\n     *\\n     * - Subtraction cannot overflow.\\n     */\\n    function sub(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {\\n        require(b <= a, errorMessage);\\n        return a - b;\\n    }\\n\\n    /**\\n     * @dev Returns the integer division of two unsigned integers, reverting with custom message on\\n     * division by zero. The result is rounded towards zero.\\n     *\\n     * CAUTION: This function is deprecated because it requires allocating memory for the error\\n     * message unnecessarily. For custom revert reasons use {tryDiv}.\\n     *\\n     * Counterpart to Solidity's `/` operator. Note: this function uses a\\n     * `revert` opcode (which leaves remaining gas untouched) while Solidity\\n     * uses an invalid opcode to revert (consuming all remaining gas).\\n     *\\n     * Requirements:\\n     *\\n     * - The divisor cannot be zero.\\n     */\\n    function div(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {\\n        require(b > 0, errorMessage);\\n        return a / b;\\n    }\\n\\n    /**\\n     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),\\n     * reverting with custom message when dividing by zero.\\n     *\\n     * CAUTION: This function is deprecated because it requires allocating memory for the error\\n     * message unnecessarily. For custom revert reasons use {tryMod}.\\n     *\\n     * Counterpart to Solidity's `%` operator. This function uses a `revert`\\n     * opcode (which leaves remaining gas untouched) while Solidity uses an\\n     * invalid opcode to revert (consuming all remaining gas).\\n     *\\n     * Requirements:\\n     *\\n     * - The divisor cannot be zero.\\n     */\\n    function mod(uint256 a, uint256 b, string memory errorMessage) internal pure returns (uint256) {\\n        require(b > 0, errorMessage);\\n        return a % b;\\n    }\\n}\\n\",\"keccak256\":\"0xcc78a17dd88fa5a2edc60c8489e2f405c0913b377216a5b26b35656b2d0dab52\",\"license\":\"MIT\"},\"contracts/TBDETH.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.7.6;\\npragma abicoder v2;\\n\\nimport './interfaces/IHegicETHOptions.sol';\\nimport './interfaces/ICurve.sol';\\nimport './interfaces/IUniswapV2Router02.sol';\\nimport './interfaces/IChainlinkAggregatorV3.sol';\\nimport './interfaces/IERC20.sol';\\nimport './interfaces/IWETH.sol';\\nimport './interfaces/ITBD.sol';\\n\\nimport '@openzeppelin/contracts/math/SafeMath.sol';\\n\\ncontract TBDETH is ITBD {\\n    using SafeMath for uint256;\\n\\n    // Curve MetaPool used to convert alUSD to Dai\\n    ICurve alUSDMetaPool;\\n\\n    // Hegic ETH Options contract\\n    IHegicETHOptions hegicETHOptions;\\n\\n    // Uniswap router to convert Dai to Eth\\n    IUniswapV2Router02 uniswapV2Router02;\\n\\n    // alUSD, Dai and Weth ERC20 contracts\\n    IERC20 alUSD;\\n    IERC20 Dai;\\n    IWETH Weth;\\n\\n    // Store of created options\\n    mapping(address => ITBD.Option[]) public optionsByOwner;\\n\\n    // Uniswap exchange paths Dai => Eth\\n    address[] public uniswapExchangePath;\\n\\n    // Decimals for price values from aggregators\\n    uint256 constant PRICE_DECIMALS = 1e8;\\n\\n    constructor(\\n        address _hegicETHOptions,\\n        address _alUSD,\\n        address _Dai,\\n        address _Weth,\\n        address _alUSDMetaPool,\\n        address _uniswapV2Router02\\n    ) {\\n        alUSDMetaPool = ICurve(_alUSDMetaPool);\\n        hegicETHOptions = IHegicETHOptions(_hegicETHOptions);\\n        alUSD = IERC20(_alUSD);\\n        Dai = IERC20(_Dai);\\n        Weth = IWETH(_Weth);\\n        uniswapV2Router02 = IUniswapV2Router02(_uniswapV2Router02);\\n\\n        uniswapExchangePath = new address[](2);\\n        uniswapExchangePath[0] = _Dai;\\n        uniswapExchangePath[1] = _Weth;\\n    }\\n\\n    /// ITBD overriden functions\\n\\n    function purchaseOptionWithAlUSD(\\n        uint256 amount,\\n        uint256 strike,\\n        uint256 period,\\n        address owner,\\n        IHegicOptionTypes.OptionType optionType,\\n        uint256 minETH\\n    ) public override returns (uint256 optionID) {\\n        // Retrieve alUSD from user\\n        require(alUSD.transferFrom(msg.sender, address(this), amount), 'TBD/cannot-transfer-alusd');\\n\\n        // Compute curve output amount in Dai\\n        uint256 curveDyInDai = alUSDMetaPool.get_dy_underlying(0, 1, amount);\\n        // Approve alUSD for curve\\n        alUSD.approve(address(alUSDMetaPool), amount);\\n        // Swap alUSD to Dai\\n        require(\\n            alUSDMetaPool.exchange_underlying(int128(0), int128(1), amount, curveDyInDai) == curveDyInDai,\\n            'TBD/cannot-swap-alusd-to-dai'\\n        );\\n\\n        // Compute amount of Eth retrievable from Swap & check if above minimal Eth value provided\\n        // Doing it soon prevents extra gas usage in case of failure due to useless approvale and swap\\n        uint256[] memory uniswapAmounts = uniswapV2Router02.getAmountsOut(curveDyInDai, uniswapExchangePath);\\n        require(uniswapAmounts[1] > minETH, 'TBD/min-eth-not-reached');\\n\\n        // Approve Dai to Uniswap Router\\n        Dai.approve(address(uniswapV2Router02), curveDyInDai);\\n\\n        // Swap Dai for Eth\\n        uniswapAmounts =\\n            uniswapV2Router02.swapExactTokensForETH(\\n                curveDyInDai,\\n                minETH,\\n                uniswapExchangePath,\\n                address(this),\\n                block.timestamp\\n            );\\n\\n        // Reverse compute option amount\\n        uint256 optionAmount = getAmount(period, uniswapAmounts[1], strike, optionType);\\n\\n        // Create and send option to owner\\n        optionID = hegicETHOptions.create{value: uniswapAmounts[1]}(period, optionAmount, strike, optionType);\\n        hegicETHOptions.transfer(optionID, payable(owner));\\n\\n        emit PurchaseOption(owner, optionID, amount, address(alUSD), uniswapAmounts[1]);\\n\\n        // Store option\\n        optionsByOwner[msg.sender].push(ITBD.Option({id: optionID, priceInAlUSD: amount}));\\n\\n        return optionID;\\n    }\\n\\n    function getOptionsByOwner(address owner) external view override returns (ITBD.Option[] memory) {\\n        return optionsByOwner[owner];\\n    }\\n\\n    function getUnderlyingFeeFromAlUSD(uint256 amount) external view override returns (uint256) {\\n        uint256 curveDyInDai = alUSDMetaPool.get_dy_underlying(0, 1, amount);\\n        uint256[] memory uniswapWethOutput = uniswapV2Router02.getAmountsOut(curveDyInDai, uniswapExchangePath);\\n        return uniswapWethOutput[1];\\n    }\\n\\n    function getEthFeeFromAlUSD(uint256 amount) external view override returns (uint256) {\\n        uint256 curveDyInDai = alUSDMetaPool.get_dy_underlying(0, 1, amount);\\n        uint256[] memory uniswapWethOutput = uniswapV2Router02.getAmountsOut(curveDyInDai, uniswapExchangePath);\\n        return uniswapWethOutput[1];\\n    }\\n\\n    function getOptionAmountFromAlUSD(\\n        uint256 period,\\n        uint256 amount,\\n        uint256 strike,\\n        IHegicOptionTypes.OptionType optionType\\n    ) external view override returns (uint256) {\\n        uint256 curveDyInDai = alUSDMetaPool.get_dy_underlying(0, 1, amount);\\n        uint256[] memory uniswapWethOutput = uniswapV2Router02.getAmountsOut(curveDyInDai, uniswapExchangePath);\\n\\n        return getAmount(period, uniswapWethOutput[1], strike, optionType);\\n    }\\n\\n    function getAmount(\\n        uint256 period,\\n        uint256 fees,\\n        uint256 strike,\\n        IHegicOptionTypes.OptionType optionType\\n    ) public view override returns (uint256) {\\n        require(\\n            optionType == IHegicOptionTypes.OptionType.Put || optionType == IHegicOptionTypes.OptionType.Call,\\n            'invalid option type'\\n        );\\n        (, int256 latestPrice, , , ) = IChainlinkAggregatorV3(hegicETHOptions.priceProvider()).latestRoundData();\\n        uint256 currentPrice = uint256(latestPrice);\\n        uint256 iv = hegicETHOptions.impliedVolRate();\\n\\n        if (optionType == IHegicOptionTypes.OptionType.Put) {\\n            if (strike > currentPrice) {\\n                // ITM Put Fee\\n                uint256 nume = fees.mul(currentPrice).mul(PRICE_DECIMALS);\\n                uint256 sqrtPeriod = sqrt(period);\\n                uint256 denom = currentPrice.mul(PRICE_DECIMALS).div(100);\\n                denom = denom.add(sqrtPeriod.mul(iv).mul(strike));\\n                denom = denom.add(PRICE_DECIMALS.mul(strike.sub(currentPrice)));\\n                return nume.div(denom);\\n            } else {\\n                // OTM Put Fee\\n                uint256 nume = fees.mul(currentPrice).mul(PRICE_DECIMALS);\\n                uint256 sqrtPeriod = sqrt(period);\\n                uint256 denom = sqrtPeriod.mul(strike).mul(iv).add(currentPrice.mul(PRICE_DECIMALS).div(100));\\n                return nume.div(denom);\\n            }\\n        } else {\\n            if (strike < currentPrice) {\\n                // ITM Call Fee\\n                uint256 nume = fees.mul(strike).mul(PRICE_DECIMALS).mul(currentPrice);\\n                uint256 sqrtPeriod = sqrt(period);\\n                uint256 denom = strike.mul(PRICE_DECIMALS).div(100).mul(currentPrice);\\n                denom = denom.add(sqrtPeriod.mul(iv).mul(currentPrice).mul(currentPrice));\\n                denom = denom.add(strike.mul(PRICE_DECIMALS).mul(currentPrice.sub(strike)));\\n                return nume.div(denom);\\n            } else {\\n                // OTM Call Fee\\n                uint256 nume = fees.mul(strike).mul(PRICE_DECIMALS);\\n                uint256 sqrtPeriod = sqrt(period);\\n                uint256 denom = sqrtPeriod.mul(currentPrice).mul(iv).add(strike.mul(PRICE_DECIMALS).div(100));\\n                return nume.div(denom);\\n            }\\n        }\\n    }\\n\\n    /// Misc\\n\\n    function sqrt(uint256 x) private pure returns (uint256 result) {\\n        result = x;\\n        uint256 k = x.div(2).add(1);\\n        while (k < result) (result, k) = (k, x.div(k).add(k).div(2));\\n    }\\n\\n    receive() external payable {}\\n\\n}\\n\",\"keccak256\":\"0xfee5a35d6d934a41a51a89ceca5e539191d608e36b3fc563ec1c87e10f6fbaa5\",\"license\":\"MIT\"},\"contracts/interfaces/IChainlinkAggregatorV3.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.7.6;\\n\\ninterface IChainlinkAggregatorV3 {\\n    function latestRoundData()\\n        external\\n        view\\n        returns (\\n            uint80 roundId,\\n            int256 answer,\\n            uint256 startedAt,\\n            uint256 updatedAt,\\n            uint80 answeredInRound\\n        );\\n}\\n\",\"keccak256\":\"0x6bf83183d5b801ce3043ca958ee7876dbc487af64043bef4e20ad86d26cd4659\",\"license\":\"MIT\"},\"contracts/interfaces/ICurve.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.7.6;\\n\\ninterface ICurve {\\n    function get_dy_underlying(\\n        int128 i,\\n        int128 j,\\n        uint256 dx\\n    ) external view returns (uint256);\\n\\n    function exchange_underlying(\\n        int128 i,\\n        int128 j,\\n        uint256 dx,\\n        uint256 min_dy\\n    ) external returns (uint256);\\n}\\n\",\"keccak256\":\"0x1e1d03f38cfdee89ae8a8792e463c5a4209a96b605480c53399ebabfc0877adc\",\"license\":\"MIT\"},\"contracts/interfaces/IERC20.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.7.6;\\n\\ninterface IERC20 {\\n    function transferFrom(\\n        address sender,\\n        address recipient,\\n        uint256 amount\\n    ) external returns (bool);\\n\\n    function approve(address spender, uint256 amount) external returns (bool);\\n\\n    function balanceOf(address account) external view returns (uint256);\\n}\\n\",\"keccak256\":\"0x849f728bdcb28a2e01f4280f64cbbaf982cded062f1a9aefe8039f7aa28726af\",\"license\":\"MIT\"},\"contracts/interfaces/IHegicETHOptions.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.7.6;\\n\\nimport './IHegicOptionTypes.sol';\\n\\ninterface IHegicETHOptions is IHegicOptionTypes {\\n    function priceProvider() external view returns (address);\\n\\n    function impliedVolRate() external view returns (uint256);\\n\\n    enum State {Inactive, Active, Exercised, Expired}\\n\\n    function exercise(uint256 optionID) external;\\n\\n    function options(uint256)\\n        external\\n        view\\n        returns (\\n            State state,\\n            address payable holder,\\n            uint256 strike,\\n            uint256 amount,\\n            uint256 lockedAmount,\\n            uint256 premium,\\n            uint256 expiration,\\n            IHegicOptionTypes.OptionType optionType\\n        );\\n\\n    struct Option {\\n        State state;\\n        address payable holder;\\n        uint256 strike;\\n        uint256 amount;\\n        uint256 lockedAmount;\\n        uint256 premium;\\n        uint256 expiration;\\n        IHegicOptionTypes.OptionType optionType;\\n    }\\n\\n    function fees(\\n        uint256 period,\\n        uint256 amount,\\n        uint256 strike,\\n        IHegicOptionTypes.OptionType optionType\\n    )\\n        external\\n        view\\n        returns (\\n            uint256 total,\\n            uint256 settlementFee,\\n            uint256 strikeFee,\\n            uint256 periodFee\\n        );\\n\\n    function create(\\n        uint256 period,\\n        uint256 amount,\\n        uint256 strike,\\n        IHegicOptionTypes.OptionType optionType\\n    ) external payable returns (uint256 optionID);\\n\\n    function transfer(uint256 optionID, address payable newHolder) external;\\n}\\n\",\"keccak256\":\"0xd5d10f04d4168eb24fed39d85e817906f46a4b678031e716e88d7de8d8208365\",\"license\":\"MIT\"},\"contracts/interfaces/IHegicOptionTypes.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.7.6;\\n\\ninterface IHegicOptionTypes {\\n    enum OptionType {Invalid, Put, Call}\\n\\n}\",\"keccak256\":\"0xfe2207cb676c1d8c793fb68488cfce246cf20236975d5affc1669064cd1ecc95\",\"license\":\"MIT\"},\"contracts/interfaces/ITBD.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.7.6;\\npragma abicoder v2;\\n\\nimport './IHegicOptionTypes.sol';\\n\\ninterface ITBD {\\n    event PurchaseOption(\\n        address indexed owner,\\n        uint256 optionID,\\n        uint256 purchasePrice,\\n        address purchaseToken,\\n        uint256 fees\\n    );\\n\\n    struct Option {\\n        uint256 id;\\n        uint256 priceInAlUSD;\\n    }\\n\\n    /// @notice Convert alUSD to Dai using Curve, Dai to Weth using Uniswap and purchases option on Hegic\\n    /// @param amount Amount of AlUSD paid\\n    /// @param strike Strike price (with 8 decimals)\\n    /// @param period Option period in seconds (min 1 day, max 28 days) \\n    /// @param owner Address where option is sent \\n    /// @param optionType 1 for PUT, 2 for CALL\\n    /// @param minETH Prevents high slippage by setting min eth after swaps\\n    function purchaseOptionWithAlUSD(\\n        uint256 amount,\\n        uint256 strike,\\n        uint256 period,\\n        address owner,\\n        IHegicOptionTypes.OptionType optionType,\\n        uint256 minETH\\n    ) external returns (uint256 optionID);\\n\\n    /// @notice Retrieve created options\\n    /// @param owner Owner of the options to retrieve\\n    function getOptionsByOwner(address owner) external view returns (Option[] memory);\\n\\n    /// @notice Retrieve option creation cost in the underlying token\\n    /// @param amount alUSD amount used\\n    function getUnderlyingFeeFromAlUSD(uint256 amount) external view returns (uint256);\\n\\n    /// @notice Retrieve option creation cost in eth\\n    /// @param amount alUSD amount used\\n    function getEthFeeFromAlUSD(uint256 amount) external view returns (uint256);\\n\\n    /// @notice Retrieve the option size depending on all parameters + alUSD paid\\n    /// @param amount Amount of AlUSD paid\\n    /// @param strike Strike price (with 8 decimals)\\n    /// @param period Option period in seconds (min 1 day, max 28 days) \\n    /// @param optionType 1 for PUT, 2 for CALL\\n    function getOptionAmountFromAlUSD(\\n        uint256 period,\\n        uint256 amount,\\n        uint256 strike,\\n        IHegicOptionTypes.OptionType optionType\\n    ) external view returns (uint256);\\n\\n    /// @notice Retrieve the option size from the raw eth fee paid to Hegic\\n    /// @param period Option period in seconds (min 1 day, max 28 days) \\n    /// @param fees Amount of Eth paid\\n    /// @param strike Strike price (with 8 decimals)\\n    /// @param optionType 1 for PUT, 2 for CALL\\n    function getAmount(\\n        uint256 period,\\n        uint256 fees,\\n        uint256 strike,\\n        IHegicOptionTypes.OptionType optionType\\n    ) external view returns (uint256);\\n}\\n\",\"keccak256\":\"0x9476eadb372feda9f58d86ba015529495a5d8e5a7c10bcc04a0694857a9145c8\",\"license\":\"MIT\"},\"contracts/interfaces/IUniswapV2Router02.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.7.6;\\n\\ninterface IUniswapV2Router02 {\\n    function getAmountsOut(uint256 amountIn, address[] memory path) external view returns (uint256[] memory amounts);\\n\\n    function swapExactTokensForETH(\\n        uint256 amountIn,\\n        uint256 amountOutMin,\\n        address[] calldata path,\\n        address to,\\n        uint256 deadline\\n    ) external returns (uint256[] memory amounts);\\n}\\n\",\"keccak256\":\"0x8d877d2c091105ba4fa81b21702c3e095bbf1056b103a4cc3f5619b265b6d075\",\"license\":\"MIT\"},\"contracts/interfaces/IWETH.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.7.6;\\n\\nimport './IERC20.sol';\\n\\ninterface IWETH is IERC20 {\\n    function withdraw(uint256 wad) external;\\n}\\n\",\"keccak256\":\"0x4af11c50532a882b5e27cb1a76168a0ada2e5e780dcf34e5f5b887f6ea35685d\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x60806040523480156200001157600080fd5b5060405162001899380380620018998339810160408190526200003491620001ec565b600080546001600160a01b03199081166001600160a01b03858116919091179092556001805482168984161790556003805482168884161790556004805482168784161790556005805482168684161790556002805490911691831691909117815560408051828152606081018252919060208301908036833750508151620000c59260079250602001906200014e565b50836007600081548110620000d657fe5b9060005260206000200160006101000a8154816001600160a01b0302191690836001600160a01b031602179055508260076001815481106200011457fe5b9060005260206000200160006101000a8154816001600160a01b0302191690836001600160a01b031602179055505050505050506200026c565b828054828255906000526020600020908101928215620001a6579160200282015b82811115620001a657825182546001600160a01b0319166001600160a01b039091161782556020909201916001909101906200016f565b50620001b4929150620001b8565b5090565b5b80821115620001b45760008155600101620001b9565b80516001600160a01b0381168114620001e757600080fd5b919050565b60008060008060008060c0878903121562000205578182fd5b6200021087620001cf565b95506200022060208801620001cf565b94506200023060408801620001cf565b93506200024060608801620001cf565b92506200025060808801620001cf565b91506200026060a08801620001cf565b90509295509295509295565b61161d806200027c6000396000f3fe60806040526004361061007f5760003560e01c806397bcb1a71161004e57806397bcb1a71461011c578063cd3a1ca214610149578063e8d53be614610169578063f43e56d71461018957610086565b80630c242f0c1461008b57806351826dbd146100c15780637a6d1cfe146100ee57806383d3bb791461008b57610086565b3661008657005b600080fd5b34801561009757600080fd5b506100ab6100a63660046111ca565b6101a9565b6040516100b891906114d9565b60405180910390f35b3480156100cd57600080fd5b506100e16100dc366004611099565b6102dd565b6040516100b89190611377565b3480156100fa57600080fd5b5061010e6101093660046110d1565b610366565b6040516100b8929190611512565b34801561012857600080fd5b5061013c6101373660046111ca565b6103a2565b6040516100b89190611326565b34801561015557600080fd5b506100ab610164366004611253565b6103cc565b34801561017557600080fd5b506100ab610184366004611253565b61050e565b34801561019557600080fd5b506100ab6101a43660046111fa565b610894565b600080546040516307211ef760e01b815282916001600160a01b0316906307211ef7906101df90849060019088906004016113e9565b60206040518083038186803b1580156101f757600080fd5b505afa15801561020b573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061022f91906111e2565b60025460405163d06ca61f60e01b81529192506000916001600160a01b039091169063d06ca61f906102689085906007906004016114f9565b60006040518083038186803b15801561028057600080fd5b505afa158015610294573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f191682016040526102bc91908101906110fc565b9050806001815181106102cb57fe5b6020026020010151925050505b919050565b6001600160a01b0381166000908152600660209081526040808320805482518185028101850190935280835260609492939192909184015b8282101561035b57838290600052602060002090600202016040518060400160405290816000820154815260200160018201548152505081526020019060010190610315565b505050509050919050565b6006602052816000526040600020818154811061038257600080fd5b600091825260209091206002909102018054600190910154909250905082565b600781815481106103b257600080fd5b6000918252602090912001546001600160a01b0316905081565b600080546040516307211ef760e01b815282916001600160a01b0316906307211ef7906104029084906001908a906004016113e9565b60206040518083038186803b15801561041a57600080fd5b505afa15801561042e573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061045291906111e2565b60025460405163d06ca61f60e01b81529192506000916001600160a01b039091169063d06ca61f9061048b9085906007906004016114f9565b60006040518083038186803b1580156104a357600080fd5b505afa1580156104b7573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f191682016040526104df91908101906110fc565b905061050187826001815181106104f257fe5b6020026020010151878761050e565b925050505b949350505050565b6000600182600281111561051e57fe5b14806105355750600282600281111561053357fe5b145b61055a5760405162461bcd60e51b81526004016105519061143e565b60405180910390fd5b60015460408051635c4443cf60e11b815290516000926001600160a01b03169163b888879e916004808301926020929190829003018186803b15801561059f57600080fd5b505afa1580156105b3573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906105d791906110b5565b6001600160a01b031663feaf968c6040518163ffffffff1660e01b815260040160a06040518083038186803b15801561060f57600080fd5b505afa158015610623573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906106479190611291565b5050600154604080516318f88e5b60e01b815290519395508594506000936001600160a01b0390921692506318f88e5b916004808301926020929190829003018186803b15801561069757600080fd5b505afa1580156106ab573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906106cf91906111e2565b905060018560028111156106df57fe5b14156107d057818611156107815760006107076305f5e1006107018a86610eae565b90610eae565b905060006107148a610f10565b90506000610731606461072b876305f5e100610eae565b90610f52565b905061074b6107448a6107018588610eae565b8290610fb9565b905061076861074461075d8b88611013565b6305f5e10090610eae565b90506107748382610f52565b9650505050505050610506565b60006107956305f5e1006107018a86610eae565b905060006107a28a610f10565b905060006107686107bc606461072b886305f5e100610eae565b6107ca86610701868e610eae565b90610fb9565b8186101561084b5760006107ee836107016305f5e100818c8c610eae565b905060006107fb8a610f10565b9050600061081685610701606461072b8d6305f5e100610eae565b905061082b610744866107018181878a610eae565b905061076861074461083d878c611013565b6107018c6305f5e100610eae565b600061085f6305f5e1006107018a8a610eae565b9050600061086c8a610f10565b90506000610768610886606461072b8c6305f5e100610eae565b6107ca86610701868a610eae565b6003546040516323b872dd60e01b81526000916001600160a01b0316906323b872dd906108c990339030908c9060040161133a565b602060405180830381600087803b1580156108e357600080fd5b505af11580156108f7573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061091b91906111aa565b6109375760405162461bcd60e51b8152600401610551906114a2565b600080546040516307211ef760e01b81526001600160a01b03909116906307211ef79061096d9084906001908d906004016113e9565b60206040518083038186803b15801561098557600080fd5b505afa158015610999573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906109bd91906111e2565b60035460005460405163095ea7b360e01b81529293506001600160a01b039182169263095ea7b3926109f59216908c9060040161135e565b602060405180830381600087803b158015610a0f57600080fd5b505af1158015610a23573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610a4791906111aa565b5060008054604051635320bf6b60e11b815283926001600160a01b039092169163a6417ed691610a8191906001908e9087906004016113c6565b602060405180830381600087803b158015610a9b57600080fd5b505af1158015610aaf573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610ad391906111e2565b14610af05760405162461bcd60e51b815260040161055190611407565b60025460405163d06ca61f60e01b81526000916001600160a01b03169063d06ca61f90610b249085906007906004016114f9565b60006040518083038186803b158015610b3c57600080fd5b505afa158015610b50573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f19168201604052610b7891908101906110fc565b90508381600181518110610b8857fe5b602002602001015111610bad5760405162461bcd60e51b81526004016105519061146b565b6004805460025460405163095ea7b360e01b81526001600160a01b039283169363095ea7b393610be193169187910161135e565b602060405180830381600087803b158015610bfb57600080fd5b505af1158015610c0f573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610c3391906111aa565b506002546040516318cbafe560e01b81526001600160a01b03909116906318cbafe590610c6d908590889060079030904290600401611544565b600060405180830381600087803b158015610c8757600080fd5b505af1158015610c9b573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f19168201604052610cc391908101906110fc565b90506000610ce78883600181518110610cd857fe5b60200260200101518b8961050e565b6001805484519293506001600160a01b0316916380478ad19185918110610d0a57fe5b60200260200101518a848d8b6040518663ffffffff1660e01b8152600401610d359493929190611580565b6020604051808303818588803b158015610d4e57600080fd5b505af1158015610d62573d6000803e3d6000fd5b50505050506040513d601f19601f82011682018060405250810190610d8791906111e2565b60015460405163b7760c8f60e01b81529195506001600160a01b03169063b7760c8f90610dba9087908b906004016114e2565b600060405180830381600087803b158015610dd457600080fd5b505af1158015610de8573d6000803e3d6000fd5b50505050866001600160a01b03167fe449c77d99738f1181f3e8a97bc3c10c842af5b92aa379a34eb4d6bc1a137a79858c600360009054906101000a90046001600160a01b031686600181518110610e3c57fe5b6020026020010151604051610e549493929190611520565b60405180910390a2505033600090815260066020908152604080832081518083019092528582528183018c815281546001818101845592865293909420915160029093029091019182559151910155509695505050505050565b600082610ebd57506000610f0a565b82820282848281610eca57fe5b0414610f075760405162461bcd60e51b81526004018080602001828103825260218152602001806115c76021913960400191505060405180910390fd5b90505b92915050565b806000610f2360016107ca846002610f52565b90505b81811015610f4c5780610f42600261072b836107ca8882610f52565b9092509050610f26565b50919050565b6000808211610fa8576040805162461bcd60e51b815260206004820152601a60248201527f536166654d6174683a206469766973696f6e206279207a65726f000000000000604482015290519081900360640190fd5b818381610fb157fe5b049392505050565b600082820183811015610f07576040805162461bcd60e51b815260206004820152601b60248201527f536166654d6174683a206164646974696f6e206f766572666c6f770000000000604482015290519081900360640190fd5b60008282111561106a576040805162461bcd60e51b815260206004820152601e60248201527f536166654d6174683a207375627472616374696f6e206f766572666c6f770000604482015290519081900360640190fd5b50900390565b8035600381106102d857600080fd5b805169ffffffffffffffffffff811681146102d857600080fd5b6000602082840312156110aa578081fd5b8135610f07816115ae565b6000602082840312156110c6578081fd5b8151610f07816115ae565b600080604083850312156110e3578081fd5b82356110ee816115ae565b946020939093013593505050565b6000602080838503121561110e578182fd5b825167ffffffffffffffff80821115611125578384fd5b818501915085601f830112611138578384fd5b81518181111561114457fe5b8381026040518582820101818110858211171561115d57fe5b604052828152858101935084860182860187018a101561117b578788fd5b8795505b8386101561119d57805185526001959095019493860193860161117f565b5098975050505050505050565b6000602082840312156111bb578081fd5b81518015158114610f07578182fd5b6000602082840312156111db578081fd5b5035919050565b6000602082840312156111f3578081fd5b5051919050565b60008060008060008060c08789031215611212578182fd5b8635955060208701359450604087013593506060870135611232816115ae565b925061124060808801611070565b915060a087013590509295509295509295565b60008060008060808587031215611268578384fd5b84359350602085013592506040850135915061128660608601611070565b905092959194509250565b600080600080600060a086880312156112a8578081fd5b6112b18661107f565b94506020860151935060408601519250606086015191506112d46080870161107f565b90509295509295909350565b6000815480845260208085019450838352808320835b8381101561131b5781546001600160a01b0316875295820195600191820191016112f6565b509495945050505050565b6001600160a01b0391909116815260200190565b6001600160a01b039384168152919092166020820152604081019190915260600190565b6001600160a01b03929092168252602082015260400190565b602080825282518282018190526000919060409081850190868401855b828110156113b957815180518552860151868501529284019290850190600101611394565b5091979650505050505050565b600f94850b81529290930b60208301526040820152606081019190915260800190565b600f93840b81529190920b6020820152604081019190915260600190565b6020808252601c908201527f5442442f63616e6e6f742d737761702d616c7573642d746f2d64616900000000604082015260600190565b602080825260139082015272696e76616c6964206f7074696f6e207479706560681b604082015260600190565b60208082526017908201527f5442442f6d696e2d6574682d6e6f742d72656163686564000000000000000000604082015260600190565b60208082526019908201527f5442442f63616e6e6f742d7472616e736665722d616c75736400000000000000604082015260600190565b90815260200190565b9182526001600160a01b0316602082015260400190565b60008382526040602083015261050660408301846112e0565b918252602082015260400190565b93845260208401929092526001600160a01b03166040830152606082015260800190565b600086825285602083015260a0604083015261156360a08301866112e0565b6001600160a01b0394909416606083015250608001529392505050565b8481526020810184905260408101839052608081016003831061159f57fe5b82606083015295945050505050565b6001600160a01b03811681146115c357600080fd5b5056fe536166654d6174683a206d756c7469706c69636174696f6e206f766572666c6f77a2646970667358221220f8af2cb055596a3ebb8705b0be6909dc68c8de3fc8f0c8af1f5133c94393e86b64736f6c63430007060033",
+  "deployedBytecode": "0x60806040526004361061007f5760003560e01c806397bcb1a71161004e57806397bcb1a71461011c578063cd3a1ca214610149578063e8d53be614610169578063f43e56d71461018957610086565b80630c242f0c1461008b57806351826dbd146100c15780637a6d1cfe146100ee57806383d3bb791461008b57610086565b3661008657005b600080fd5b34801561009757600080fd5b506100ab6100a63660046111ca565b6101a9565b6040516100b891906114d9565b60405180910390f35b3480156100cd57600080fd5b506100e16100dc366004611099565b6102dd565b6040516100b89190611377565b3480156100fa57600080fd5b5061010e6101093660046110d1565b610366565b6040516100b8929190611512565b34801561012857600080fd5b5061013c6101373660046111ca565b6103a2565b6040516100b89190611326565b34801561015557600080fd5b506100ab610164366004611253565b6103cc565b34801561017557600080fd5b506100ab610184366004611253565b61050e565b34801561019557600080fd5b506100ab6101a43660046111fa565b610894565b600080546040516307211ef760e01b815282916001600160a01b0316906307211ef7906101df90849060019088906004016113e9565b60206040518083038186803b1580156101f757600080fd5b505afa15801561020b573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061022f91906111e2565b60025460405163d06ca61f60e01b81529192506000916001600160a01b039091169063d06ca61f906102689085906007906004016114f9565b60006040518083038186803b15801561028057600080fd5b505afa158015610294573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f191682016040526102bc91908101906110fc565b9050806001815181106102cb57fe5b6020026020010151925050505b919050565b6001600160a01b0381166000908152600660209081526040808320805482518185028101850190935280835260609492939192909184015b8282101561035b57838290600052602060002090600202016040518060400160405290816000820154815260200160018201548152505081526020019060010190610315565b505050509050919050565b6006602052816000526040600020818154811061038257600080fd5b600091825260209091206002909102018054600190910154909250905082565b600781815481106103b257600080fd5b6000918252602090912001546001600160a01b0316905081565b600080546040516307211ef760e01b815282916001600160a01b0316906307211ef7906104029084906001908a906004016113e9565b60206040518083038186803b15801561041a57600080fd5b505afa15801561042e573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061045291906111e2565b60025460405163d06ca61f60e01b81529192506000916001600160a01b039091169063d06ca61f9061048b9085906007906004016114f9565b60006040518083038186803b1580156104a357600080fd5b505afa1580156104b7573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f191682016040526104df91908101906110fc565b905061050187826001815181106104f257fe5b6020026020010151878761050e565b925050505b949350505050565b6000600182600281111561051e57fe5b14806105355750600282600281111561053357fe5b145b61055a5760405162461bcd60e51b81526004016105519061143e565b60405180910390fd5b60015460408051635c4443cf60e11b815290516000926001600160a01b03169163b888879e916004808301926020929190829003018186803b15801561059f57600080fd5b505afa1580156105b3573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906105d791906110b5565b6001600160a01b031663feaf968c6040518163ffffffff1660e01b815260040160a06040518083038186803b15801561060f57600080fd5b505afa158015610623573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906106479190611291565b5050600154604080516318f88e5b60e01b815290519395508594506000936001600160a01b0390921692506318f88e5b916004808301926020929190829003018186803b15801561069757600080fd5b505afa1580156106ab573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906106cf91906111e2565b905060018560028111156106df57fe5b14156107d057818611156107815760006107076305f5e1006107018a86610eae565b90610eae565b905060006107148a610f10565b90506000610731606461072b876305f5e100610eae565b90610f52565b905061074b6107448a6107018588610eae565b8290610fb9565b905061076861074461075d8b88611013565b6305f5e10090610eae565b90506107748382610f52565b9650505050505050610506565b60006107956305f5e1006107018a86610eae565b905060006107a28a610f10565b905060006107686107bc606461072b886305f5e100610eae565b6107ca86610701868e610eae565b90610fb9565b8186101561084b5760006107ee836107016305f5e100818c8c610eae565b905060006107fb8a610f10565b9050600061081685610701606461072b8d6305f5e100610eae565b905061082b610744866107018181878a610eae565b905061076861074461083d878c611013565b6107018c6305f5e100610eae565b600061085f6305f5e1006107018a8a610eae565b9050600061086c8a610f10565b90506000610768610886606461072b8c6305f5e100610eae565b6107ca86610701868a610eae565b6003546040516323b872dd60e01b81526000916001600160a01b0316906323b872dd906108c990339030908c9060040161133a565b602060405180830381600087803b1580156108e357600080fd5b505af11580156108f7573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061091b91906111aa565b6109375760405162461bcd60e51b8152600401610551906114a2565b600080546040516307211ef760e01b81526001600160a01b03909116906307211ef79061096d9084906001908d906004016113e9565b60206040518083038186803b15801561098557600080fd5b505afa158015610999573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906109bd91906111e2565b60035460005460405163095ea7b360e01b81529293506001600160a01b039182169263095ea7b3926109f59216908c9060040161135e565b602060405180830381600087803b158015610a0f57600080fd5b505af1158015610a23573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610a4791906111aa565b5060008054604051635320bf6b60e11b815283926001600160a01b039092169163a6417ed691610a8191906001908e9087906004016113c6565b602060405180830381600087803b158015610a9b57600080fd5b505af1158015610aaf573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610ad391906111e2565b14610af05760405162461bcd60e51b815260040161055190611407565b60025460405163d06ca61f60e01b81526000916001600160a01b03169063d06ca61f90610b249085906007906004016114f9565b60006040518083038186803b158015610b3c57600080fd5b505afa158015610b50573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f19168201604052610b7891908101906110fc565b90508381600181518110610b8857fe5b602002602001015111610bad5760405162461bcd60e51b81526004016105519061146b565b6004805460025460405163095ea7b360e01b81526001600160a01b039283169363095ea7b393610be193169187910161135e565b602060405180830381600087803b158015610bfb57600080fd5b505af1158015610c0f573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610c3391906111aa565b506002546040516318cbafe560e01b81526001600160a01b03909116906318cbafe590610c6d908590889060079030904290600401611544565b600060405180830381600087803b158015610c8757600080fd5b505af1158015610c9b573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f19168201604052610cc391908101906110fc565b90506000610ce78883600181518110610cd857fe5b60200260200101518b8961050e565b6001805484519293506001600160a01b0316916380478ad19185918110610d0a57fe5b60200260200101518a848d8b6040518663ffffffff1660e01b8152600401610d359493929190611580565b6020604051808303818588803b158015610d4e57600080fd5b505af1158015610d62573d6000803e3d6000fd5b50505050506040513d601f19601f82011682018060405250810190610d8791906111e2565b60015460405163b7760c8f60e01b81529195506001600160a01b03169063b7760c8f90610dba9087908b906004016114e2565b600060405180830381600087803b158015610dd457600080fd5b505af1158015610de8573d6000803e3d6000fd5b50505050866001600160a01b03167fe449c77d99738f1181f3e8a97bc3c10c842af5b92aa379a34eb4d6bc1a137a79858c600360009054906101000a90046001600160a01b031686600181518110610e3c57fe5b6020026020010151604051610e549493929190611520565b60405180910390a2505033600090815260066020908152604080832081518083019092528582528183018c815281546001818101845592865293909420915160029093029091019182559151910155509695505050505050565b600082610ebd57506000610f0a565b82820282848281610eca57fe5b0414610f075760405162461bcd60e51b81526004018080602001828103825260218152602001806115c76021913960400191505060405180910390fd5b90505b92915050565b806000610f2360016107ca846002610f52565b90505b81811015610f4c5780610f42600261072b836107ca8882610f52565b9092509050610f26565b50919050565b6000808211610fa8576040805162461bcd60e51b815260206004820152601a60248201527f536166654d6174683a206469766973696f6e206279207a65726f000000000000604482015290519081900360640190fd5b818381610fb157fe5b049392505050565b600082820183811015610f07576040805162461bcd60e51b815260206004820152601b60248201527f536166654d6174683a206164646974696f6e206f766572666c6f770000000000604482015290519081900360640190fd5b60008282111561106a576040805162461bcd60e51b815260206004820152601e60248201527f536166654d6174683a207375627472616374696f6e206f766572666c6f770000604482015290519081900360640190fd5b50900390565b8035600381106102d857600080fd5b805169ffffffffffffffffffff811681146102d857600080fd5b6000602082840312156110aa578081fd5b8135610f07816115ae565b6000602082840312156110c6578081fd5b8151610f07816115ae565b600080604083850312156110e3578081fd5b82356110ee816115ae565b946020939093013593505050565b6000602080838503121561110e578182fd5b825167ffffffffffffffff80821115611125578384fd5b818501915085601f830112611138578384fd5b81518181111561114457fe5b8381026040518582820101818110858211171561115d57fe5b604052828152858101935084860182860187018a101561117b578788fd5b8795505b8386101561119d57805185526001959095019493860193860161117f565b5098975050505050505050565b6000602082840312156111bb578081fd5b81518015158114610f07578182fd5b6000602082840312156111db578081fd5b5035919050565b6000602082840312156111f3578081fd5b5051919050565b60008060008060008060c08789031215611212578182fd5b8635955060208701359450604087013593506060870135611232816115ae565b925061124060808801611070565b915060a087013590509295509295509295565b60008060008060808587031215611268578384fd5b84359350602085013592506040850135915061128660608601611070565b905092959194509250565b600080600080600060a086880312156112a8578081fd5b6112b18661107f565b94506020860151935060408601519250606086015191506112d46080870161107f565b90509295509295909350565b6000815480845260208085019450838352808320835b8381101561131b5781546001600160a01b0316875295820195600191820191016112f6565b509495945050505050565b6001600160a01b0391909116815260200190565b6001600160a01b039384168152919092166020820152604081019190915260600190565b6001600160a01b03929092168252602082015260400190565b602080825282518282018190526000919060409081850190868401855b828110156113b957815180518552860151868501529284019290850190600101611394565b5091979650505050505050565b600f94850b81529290930b60208301526040820152606081019190915260800190565b600f93840b81529190920b6020820152604081019190915260600190565b6020808252601c908201527f5442442f63616e6e6f742d737761702d616c7573642d746f2d64616900000000604082015260600190565b602080825260139082015272696e76616c6964206f7074696f6e207479706560681b604082015260600190565b60208082526017908201527f5442442f6d696e2d6574682d6e6f742d72656163686564000000000000000000604082015260600190565b60208082526019908201527f5442442f63616e6e6f742d7472616e736665722d616c75736400000000000000604082015260600190565b90815260200190565b9182526001600160a01b0316602082015260400190565b60008382526040602083015261050660408301846112e0565b918252602082015260400190565b93845260208401929092526001600160a01b03166040830152606082015260800190565b600086825285602083015260a0604083015261156360a08301866112e0565b6001600160a01b0394909416606083015250608001529392505050565b8481526020810184905260408101839052608081016003831061159f57fe5b82606083015295945050505050565b6001600160a01b03811681146115c357600080fd5b5056fe536166654d6174683a206d756c7469706c69636174696f6e206f766572666c6f77a2646970667358221220f8af2cb055596a3ebb8705b0be6909dc68c8de3fc8f0c8af1f5133c94393e86b64736f6c63430007060033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "getAmount(uint256,uint256,uint256,uint8)": {
+        "params": {
+          "fees": "Amount of Eth paid",
+          "optionType": "1 for PUT, 2 for CALL",
+          "period": "Option period in seconds (min 1 day, max 28 days) ",
+          "strike": "Strike price (with 8 decimals)"
+        }
+      },
+      "getEthFeeFromAlUSD(uint256)": {
+        "params": {
+          "amount": "alUSD amount used"
+        }
+      },
+      "getOptionAmountFromAlUSD(uint256,uint256,uint256,uint8)": {
+        "params": {
+          "amount": "Amount of AlUSD paid",
+          "optionType": "1 for PUT, 2 for CALL",
+          "period": "Option period in seconds (min 1 day, max 28 days) ",
+          "strike": "Strike price (with 8 decimals)"
+        }
+      },
+      "getOptionsByOwner(address)": {
+        "params": {
+          "owner": "Owner of the options to retrieve"
+        }
+      },
+      "getUnderlyingFeeFromAlUSD(uint256)": {
+        "params": {
+          "amount": "alUSD amount used"
+        }
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "getAmount(uint256,uint256,uint256,uint8)": {
+        "notice": "Retrieve the option size from the raw eth fee paid to Hegic"
+      },
+      "getEthFeeFromAlUSD(uint256)": {
+        "notice": "Retrieve option creation cost in eth"
+      },
+      "getOptionAmountFromAlUSD(uint256,uint256,uint256,uint8)": {
+        "notice": "Retrieve the option size depending on all parameters + alUSD paid"
+      },
+      "getOptionsByOwner(address)": {
+        "notice": "Retrieve created options"
+      },
+      "getUnderlyingFeeFromAlUSD(uint256)": {
+        "notice": "Retrieve option creation cost in the underlying token"
+      },
+      "purchaseOptionWithAlUSD(uint256,uint256,uint256,address,uint8,uint256)": {
+        "notice": "ITBD overriden functions"
+      }
+    },
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 1156,
+        "contract": "contracts/TBDETH.sol:TBDETH",
+        "label": "alUSDMetaPool",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_contract(ICurve)1923"
+      },
+      {
+        "astId": 1158,
+        "contract": "contracts/TBDETH.sol:TBDETH",
+        "label": "hegicETHOptions",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_contract(IHegicETHOptions)2161"
+      },
+      {
+        "astId": 1160,
+        "contract": "contracts/TBDETH.sol:TBDETH",
+        "label": "uniswapV2Router02",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_contract(IUniswapV2Router02)2292"
+      },
+      {
+        "astId": 1162,
+        "contract": "contracts/TBDETH.sol:TBDETH",
+        "label": "alUSD",
+        "offset": 0,
+        "slot": "3",
+        "type": "t_contract(IERC20)1953"
+      },
+      {
+        "astId": 1164,
+        "contract": "contracts/TBDETH.sol:TBDETH",
+        "label": "Dai",
+        "offset": 0,
+        "slot": "4",
+        "type": "t_contract(IERC20)1953"
+      },
+      {
+        "astId": 1166,
+        "contract": "contracts/TBDETH.sol:TBDETH",
+        "label": "Weth",
+        "offset": 0,
+        "slot": "5",
+        "type": "t_contract(IWETH)2303"
+      },
+      {
+        "astId": 1171,
+        "contract": "contracts/TBDETH.sol:TBDETH",
+        "label": "optionsByOwner",
+        "offset": 0,
+        "slot": "6",
+        "type": "t_mapping(t_address,t_array(t_struct(Option)2189_storage)dyn_storage)"
+      },
+      {
+        "astId": 1174,
+        "contract": "contracts/TBDETH.sol:TBDETH",
+        "label": "uniswapExchangePath",
+        "offset": 0,
+        "slot": "7",
+        "type": "t_array(t_address)dyn_storage"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_array(t_address)dyn_storage": {
+        "base": "t_address",
+        "encoding": "dynamic_array",
+        "label": "address[]",
+        "numberOfBytes": "32"
+      },
+      "t_array(t_struct(Option)2189_storage)dyn_storage": {
+        "base": "t_struct(Option)2189_storage",
+        "encoding": "dynamic_array",
+        "label": "struct ITBD.Option[]",
+        "numberOfBytes": "32"
+      },
+      "t_contract(ICurve)1923": {
+        "encoding": "inplace",
+        "label": "contract ICurve",
+        "numberOfBytes": "20"
+      },
+      "t_contract(IERC20)1953": {
+        "encoding": "inplace",
+        "label": "contract IERC20",
+        "numberOfBytes": "20"
+      },
+      "t_contract(IHegicETHOptions)2161": {
+        "encoding": "inplace",
+        "label": "contract IHegicETHOptions",
+        "numberOfBytes": "20"
+      },
+      "t_contract(IUniswapV2Router02)2292": {
+        "encoding": "inplace",
+        "label": "contract IUniswapV2Router02",
+        "numberOfBytes": "20"
+      },
+      "t_contract(IWETH)2303": {
+        "encoding": "inplace",
+        "label": "contract IWETH",
+        "numberOfBytes": "20"
+      },
+      "t_mapping(t_address,t_array(t_struct(Option)2189_storage)dyn_storage)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => struct ITBD.Option[])",
+        "numberOfBytes": "32",
+        "value": "t_array(t_struct(Option)2189_storage)dyn_storage"
+      },
+      "t_struct(Option)2189_storage": {
+        "encoding": "inplace",
+        "label": "struct ITBD.Option",
+        "members": [
+          {
+            "astId": 2186,
+            "contract": "contracts/TBDETH.sol:TBDETH",
+            "label": "id",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 2188,
+            "contract": "contracts/TBDETH.sol:TBDETH",
+            "label": "priceInAlUSD",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint256"
+          }
+        ],
+        "numberOfBytes": "64"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      }
+    }
+  }
+}

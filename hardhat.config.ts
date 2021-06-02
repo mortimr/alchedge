@@ -4,6 +4,7 @@ import 'solidity-coverage';
 import 'hardhat-gas-reporter';
 import 'hardhat-tracer';
 import '@nomiclabs/hardhat-solhint';
+import '@nomiclabs/hardhat-etherscan';
 import 'hardhat-prettier';
 import 'hardhat-docgen';
 import 'hardhat-deploy';
@@ -41,6 +42,18 @@ module.exports = {
       },
     ]
   },
+  ...(process.env.ETHERSCAN_API_KEY ?
+    {
+      etherscan: {
+        apiKey: process.env.ETHERSCAN_API_KEY
+      },
+
+    }
+    :
+    {
+
+
+    }),
   networks: {
     ...(process.env.MAINNET === 'true' ?
       {
