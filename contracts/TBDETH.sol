@@ -68,18 +68,29 @@ contract TBDETH is ITBD {
         IHegicOptionTypes.OptionType optionType,
         uint256 minETH
     ) public override returns (uint256 optionID) {
+        // Retrieve alUSD from user
         require(alUSD.transferFrom(msg.sender, address(this), amount), 'TBD/cannot-transfer-alusd');
 
+        // Compute curve output amount in Dai
         uint256 curveDyInDai = alUSDMetaPool.get_dy_underlying(0, 1, amount);
+        // Approve alUSD for curve
         alUSD.approve(address(alUSDMetaPool), amount);
+        // Swap alUSD to Dai
         require(
             alUSDMetaPool.exchange_underlying(int128(0), int128(1), amount, curveDyInDai) == curveDyInDai,
             'TBD/cannot-swap-alusd-to-dai'
         );
 
+        // Compute amount of Eth retrievable from Swap & check if above minimal Eth value provided
+        // Doing it soon prevents extra gas usage in case of failure due to useless approvale and swap
+        uint256[] memory uniswapAmounts = uniswapV2Router02.getAmountsOut(curveDyInDai, uniswapExchangePath);
+        require(uniswapAmounts[1] > minETH, 'TBD/min-eth-not-reached');
+
+        // Approve Dai to Uniswap Router
         Dai.approve(address(uniswapV2Router02), curveDyInDai);
 
-        uint256[] memory uniswapAmounts =
+        // Swap Dai for Eth
+        uniswapAmounts =
             uniswapV2Router02.swapExactTokensForETH(
                 curveDyInDai,
                 minETH,
@@ -88,13 +99,16 @@ contract TBDETH is ITBD {
                 block.timestamp
             );
 
+        // Reverse compute option amount
         uint256 optionAmount = getAmount(period, uniswapAmounts[1], strike, optionType);
 
+        // Create and send option to owner
         optionID = hegicETHOptions.create{value: uniswapAmounts[1]}(period, optionAmount, strike, optionType);
         hegicETHOptions.transfer(optionID, payable(owner));
 
         emit PurchaseOption(owner, optionID, amount, address(alUSD), uniswapAmounts[1]);
 
+        // Store option
         optionsByOwner[msg.sender].push(ITBD.Option({id: optionID, priceInAlUSD: amount}));
 
         return optionID;

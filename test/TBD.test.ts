@@ -219,6 +219,8 @@ describe('HegicAlUSD', function () {
 
     it('purchase 50k Dai of eth 2300 1 week otm put @ 2487.32', async function () {
 
+      this.timeout(60000);
+
       // recover current data from oracle
       const currentData = await ctx.dependencies.EACETHAggregatorProxy.latestRoundData();
       // set current data in mock contract
@@ -278,9 +280,11 @@ describe('HegicAlUSD', function () {
       expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('70652561549095706671');
       expect(optionDetails.premium.add(optionDetails.amount.div(100)).sub(wethGoingToBePaid).toString()).to.equal('-1');
 
-    }).timeout(60000);
+    });
 
     it('purchase 50k Dai of eth 2500 1 week itm put @ 2487.32', async function () {
+
+      this.timeout(60000);
 
       // recover current data from oracle
       const currentData = await ctx.dependencies.EACETHAggregatorProxy.latestRoundData();
@@ -342,9 +346,11 @@ describe('HegicAlUSD', function () {
       expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('67539944468486811996');
       expect(optionDetails.premium.add(optionDetails.amount.div(100)).sub(wethGoingToBePaid).toString()).to.equal('-2');
 
-    }).timeout(60000);
+    });
 
     it('purchase 50k Dai of eth 3600 1 week otm call @ 2487.32', async function () {
+
+      this.timeout(60000);
 
       // recover current data from oracle
       const currentData = await ctx.dependencies.EACETHAggregatorProxy.latestRoundData();
@@ -405,9 +411,11 @@ describe('HegicAlUSD', function () {
       expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('27009998599674874051');
       expect(optionDetails.premium.add(optionDetails.amount.div(100)).sub(wethGoingToBePaid).toString()).to.equal('-1');
 
-    }).timeout(60000);
+    });
 
     it('purchase 50k Dai of eth 3300 1 week itm call @ 2487.32', async function () {
+
+      this.timeout(60000);
 
       // recover current data from oracle
       const currentData = await ctx.dependencies.EACETHAggregatorProxy.latestRoundData();
@@ -468,9 +476,11 @@ describe('HegicAlUSD', function () {
       expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('45584914340063155846');
       expect(optionDetails.premium.add(optionDetails.amount.div(100)).sub(wethGoingToBePaid).toString()).to.equal('-1');
 
-    }).timeout(60000);
+    });
 
     it('should fail for insufficient approval', async function () {
+
+      this.timeout(60000);
 
       // recover current data from oracle
       const currentData = await ctx.dependencies.EACETHAggregatorProxy.latestRoundData();
@@ -512,13 +522,15 @@ describe('HegicAlUSD', function () {
         wethGoingToBePaid.mul(995).div(1000) // 0.5% slippage allowed
       )).to.eventually.be.rejectedWith('revert ERC20: transfer amount exceeds allowance');
 
-    }).timeout(60000);
+    });
 
   });
 
   describe('testing btc options scenarios', function () {
 
     it('purchase 50k Dai of btc 39000 1 week otm put @ 35869.7', async function () {
+
+      this.timeout(60000);
 
       // recover current data from oracle
       const currentData = await ctx.dependencies.EACBTCAggregatorProxy.latestRoundData();
@@ -580,9 +592,11 @@ describe('HegicAlUSD', function () {
       expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('127587842');
       expect(optionDetails.premium.add(optionDetails.amount.div(100)).sub(wbtcGoingToBePaid).toString()).to.equal('-1');
 
-    }).timeout(60000);
+    });
 
     it('purchase 50k Dai of btc 44000 1 week otm put @ 35869.7', async function () {
+
+      this.timeout(60000);
 
       // recover current data from oracle
       const currentData = await ctx.dependencies.EACBTCAggregatorProxy.latestRoundData();
@@ -644,9 +658,11 @@ describe('HegicAlUSD', function () {
       expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('74797009');
       expect(optionDetails.premium.add(optionDetails.amount.div(100)).sub(wbtcGoingToBePaid).toString()).to.equal('-2');
 
-    }).timeout(60000);
+    });
 
     it('purchase 50k Dai of btc 48000 1 week otm call @ 35869.7', async function () {
+
+      this.timeout(60000);
 
       // recover current data from oracle
       const currentData = await ctx.dependencies.EACBTCAggregatorProxy.latestRoundData();
@@ -708,9 +724,11 @@ describe('HegicAlUSD', function () {
       expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('210267000');
       expect(optionDetails.premium.add(optionDetails.amount.div(100)).sub(wbtcGoingToBePaid).toString()).to.equal('-1');
 
-    }).timeout(60000);
+    });
 
     it('purchase 50k Dai of btc 42000 1 week itm call @ 35869.7', async function () {
+
+      this.timeout(60000);
 
       // recover current data from oracle
       const currentData = await ctx.dependencies.EACBTCAggregatorProxy.latestRoundData();
@@ -772,9 +790,11 @@ describe('HegicAlUSD', function () {
       expect(balanceAfter.sub(balance).sub(optionDetails.premium.add(optionDetails.amount.div(100))).toString()).to.equal('442901429');
       expect(optionDetails.premium.add(optionDetails.amount.div(100)).sub(wbtcGoingToBePaid).toString()).to.equal('-1');
 
-    }).timeout(60000);
+    });
 
     it('should fail for insufficient approval', async function () {
+
+      this.timeout(60000);
 
       // recover current data from oracle
       const currentData = await ctx.dependencies.EACBTCAggregatorProxy.latestRoundData();
@@ -816,7 +836,7 @@ describe('HegicAlUSD', function () {
         wethGoingToBePaid.mul(995).div(1000) // 0.5% slippage allowed
       )).to.eventually.be.rejectedWith('revert ERC20: transfer amount exceeds allowance');
 
-    }).timeout(60000);
+    });
 
   });
 
