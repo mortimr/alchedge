@@ -4,7 +4,7 @@ These smart contracts help the user convert their `alUSD` into a Hegic Option of
 
 ## ITBD.sol
 
-This interface is used by both the BTC and the ETH contracts. It defines all the utility functions required for the process to work. The only state modifying method is `purchaseOptionWithAlUSD`;
+This interface is used by both the BTC and the ETH contracts. It defines all the utility functions required for the process to work. The only state modifying method is `purchaseOptionWithAlUSD`
 
 ## ITBDBTC.sol & ITBDBTC.sol
 
@@ -24,7 +24,7 @@ Hegic's fee model is reversed in the `getAmount` utility function. The result te
 
 ## Tests
 
-To run smart contract tests, you will need an ethereum rpc endpoint. The tests are running on a mainnet fork and currently only work with the hard coded block number from the config. I suggest using an Alchemy endpoint.
+To run smart contract tests, you will need an ethereum rpc endpoint. The tests are running on a mainnet fork and currently only work with the hard coded block number from the config (as checked values change if the oracle prices change too). I suggest using an Alchemy endpoint.
 
 ```
 env FORK=true FORK_ETHEREUM_RPC_URL=<url> npx hardhat test
