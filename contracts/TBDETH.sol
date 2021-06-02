@@ -32,7 +32,7 @@ contract TBDETH is ITBD {
     // Store of created options
     mapping(address => ITBD.Option[]) public optionsByOwner;
 
-    // Uniswap exchange paths Dai => Eth and Eth => Wbtc
+    // Uniswap exchange paths Dai => Eth
     address[] public uniswapExchangePath;
 
     // Decimals for price values from aggregators
