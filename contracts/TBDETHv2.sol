@@ -156,7 +156,7 @@ contract TBDETHv2 is TBDFees, ITBDv2 {
         uint256 curveDyInDai = alUSDMetaPool.get_dy_underlying(0, 1, amount);
         uint256[] memory uniswapWethOutput = uniswapV2Router02.getAmountsOut(curveDyInDai, uniswapExchangePath);
 
-        return getAmount(period, uniswapWethOutput[1], strike, optionType);
+        return getAmount(period, computeAmountWithFees(uniswapWethOutput[1]), strike, optionType);
     }
 
     function getAmount(
