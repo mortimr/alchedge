@@ -8,11 +8,13 @@ import './interfaces/IUniswapV2Router02.sol';
 import './interfaces/IChainlinkAggregatorV3.sol';
 import './interfaces/IERC20.sol';
 import './interfaces/IWETH.sol';
-import './interfaces/ITBD.sol';
+import './interfaces/ITBDv2.sol';
+import './TBDFees.sol';
 
 import '@openzeppelin/contracts/math/SafeMath.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
 
-contract TBDBTC is ITBD {
+contract TBDBTCv2 is TBDFees, ITBDv2 {
     using SafeMath for uint256;
 
     // Curve MetaPool used to convert alUSD to Dai
@@ -31,7 +33,7 @@ contract TBDBTC is ITBD {
     IWETH Weth;
 
     // Store of created options
-    mapping(address => ITBD.Option[]) public optionsByOwner;
+    mapping(address => ITBDv2.Option[]) public optionsByOwner;
 
     // Uniswap exchange paths Dai => Eth and Eth => Wbtc
     address[] public uniswapExchangePath;
@@ -47,8 +49,19 @@ contract TBDBTC is ITBD {
         address _Weth,
         address _Wbtc,
         address _alUSDMetaPool,
-        address _uniswapV2Router02
+        address _uniswapV2Router02,
+        address _owner,
+        uint256 _fee
     ) {
+        require(_fee <= FEE_DECIMALS, 'TBDv2/invalid-fee-amount');
+        require(_alUSDMetaPool != address(0), 'TBDv2/null-alusd-pool');
+        require(_hegicBTCOptions != address(0), 'TBDv2/null-hegic-btc-options');
+        require(_alUSD != address(0), 'TBDv2/null-alusd');
+        require(_Dai != address(0), 'TBDv2/null-dai');
+        require(_Weth != address(0), 'TBDv2/null-weth');
+        require(_Wbtc != address(0), 'TBDv2/null-wbtc');
+        require(_uniswapV2Router02 != address(0), 'TBDv2/null-uniswap-router');
+
         alUSDMetaPool = ICurve(_alUSDMetaPool);
         hegicBTCOptions = IHegicBTCOptions(_hegicBTCOptions);
         alUSD = IERC20(_alUSD);
@@ -56,6 +69,7 @@ contract TBDBTC is ITBD {
         Weth = IWETH(_Weth);
         Wbtc = IERC20(_Wbtc);
         uniswapV2Router02 = IUniswapV2Router02(_uniswapV2Router02);
+        fee = _fee;
 
         uniswapExchangePath = new address[](2);
         uniswapExchangePath[0] = _Dai;
@@ -64,9 +78,13 @@ contract TBDBTC is ITBD {
         uniswapBtcExchangePath = new address[](2);
         uniswapBtcExchangePath[0] = _Weth;
         uniswapBtcExchangePath[1] = _Wbtc;
+
+        Ownable.transferOwnership(_owner);
+
+        emit ChangeFee(owner(), fee);
     }
 
-    /// ITBD overriden functions
+    /// ITBDv2 overriden functions
 
     function purchaseOptionWithAlUSD(
         uint256 amount,
@@ -86,13 +104,13 @@ contract TBDBTC is ITBD {
         // Swap alUSD to Dai
         require(
             alUSDMetaPool.exchange_underlying(int128(0), int128(1), amount, curveDyInDai) == curveDyInDai,
-            'TBD/cannot-swap-alusd-to-dai'
+            'TBDv2/cannot-swap-alusd-to-dai'
         );
 
         // Compute amount of Eth retrievable from Swap & check if above minimal Eth value provided
         // Doing it soon prevents extra gas usage in case of failure due to useless approval and swap
         uint256[] memory uniswapAmounts = uniswapV2Router02.getAmountsOut(curveDyInDai, uniswapExchangePath);
-        require(uniswapAmounts[1] > minETH, 'TBD/min-eth-not-reached');
+        require(computeAmountWithFees(uniswapAmounts[1]) > minETH, 'TBDv2/min-eth-not-reached');
 
         // Approve Dai to Uniswap Router
         Dai.approve(address(uniswapV2Router02), curveDyInDai);
@@ -107,34 +125,36 @@ contract TBDBTC is ITBD {
                 block.timestamp
             );
 
+        uint256 optionAmountWithFees = computeAmountWithFees(uniswapAmounts[1]);
+
         // Reverse compute option amount
-        uint256 optionAmount = getAmount(period, uniswapAmounts[1], strike, optionType);
+        uint256 optionAmount = getAmount(period, optionAmountWithFees, strike, optionType);
 
         // Create and send option to owner
-        optionID = hegicBTCOptions.create{value: uniswapAmounts[1]}(period, optionAmount, strike, optionType);
+        optionID = hegicBTCOptions.create{value: optionAmountWithFees}(period, optionAmount, strike, optionType);
         hegicBTCOptions.transfer(optionID, payable(owner));
 
-        emit PurchaseOption(owner, optionID, amount, address(alUSD), uniswapAmounts[1]);
+        emit PurchaseOption(owner, optionID, amount, address(alUSD), optionAmountWithFees, uniswapAmounts[1] - optionAmountWithFees);
 
         // Store option
-        optionsByOwner[msg.sender].push(ITBD.Option({id: optionID, priceInAlUSD: amount}));
+        optionsByOwner[msg.sender].push(ITBDv2.Option({id: optionID, priceInAlUSD: amount}));
 
         return optionID;
     }
 
-    function getOptionsByOwner(address owner) external view override returns (ITBD.Option[] memory) {
+    function getOptionsByOwner(address owner) external view override returns (ITBDv2.Option[] memory) {
         return optionsByOwner[owner];
     }
 
     function getUnderlyingFeeFromAlUSD(uint256 amount) external view override returns (uint256) {
         uint256 curveDyInDai = alUSDMetaPool.get_dy_underlying(0, 1, amount);
         uint256[] memory uniswapWethOutput = uniswapV2Router02.getAmountsOut(curveDyInDai, uniswapExchangePath);
-        return uniswapV2Router02.getAmountsOut(uniswapWethOutput[1], uniswapBtcExchangePath)[1];
+        return uniswapV2Router02.getAmountsOut(computeAmountWithFees(uniswapWethOutput[1]), uniswapBtcExchangePath)[1];
     }
 
     function getEthFeeFromAlUSD(uint256 amount) external view override returns (uint256) {
         uint256 curveDyInDai = alUSDMetaPool.get_dy_underlying(0, 1, amount);
-        return uniswapV2Router02.getAmountsOut(curveDyInDai, uniswapExchangePath)[1];
+        return computeAmountWithFees(uniswapV2Router02.getAmountsOut(curveDyInDai, uniswapExchangePath)[1]);
     }
 
     function getOptionAmountFromAlUSD(
@@ -157,7 +177,7 @@ contract TBDBTC is ITBD {
     ) public view override returns (uint256) {
         require(
             optionType == IHegicOptionTypes.OptionType.Put || optionType == IHegicOptionTypes.OptionType.Call,
-            'invalid option type'
+            'TBDv2/invalid-option-type'
         );
         (, int256 latestPrice, , , ) = IChainlinkAggregatorV3(hegicBTCOptions.priceProvider()).latestRoundData();
         uint256 currentPrice = uint256(latestPrice);
